@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>自强学堂</title>
+</head>
+<body>
+ 
+<a href="{% url 'add' 4 5 %}">计算 4+5</a>
+ {{TutorialList}}<br/>
+ 
+ {% for i in TutorialList %}
+{{ i }}<br/>
+{% endfor %}
+
+<br/>
+k1 = {{dict.k1}}
+<Br/>
+{% for key, value in dict.items %}
+    {{ key }}: {{ value }}
+{% endfor %}
+<br/>
+{{ request.user }}
+<br/>
+{{ request.user.is_authenticated }}
+<br/>
+{{ request.path }}
+<Br/>
+{{ request.GET.urlencode }}
+<br/>
+<a href="{{ request.path }}?{{ request.GET.urlencode }}&delete=1">当前网址加参数 delete</a>
+</body>
+</html>
