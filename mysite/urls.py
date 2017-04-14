@@ -15,11 +15,19 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from hooked_server import views as hooked_server_views
+import xadmin,smart_selects
+xadmin.autodiscover();
+from xadmin.plugins import xversion
+xversion.register_models()
 
 urlpatterns = [ 
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^xadmin/', include(xadmin.site.urls)), 
+    url(r'^chaining/', include('smart_selects.urls')),
     url(r'^$', hooked_server_views.index),
+    url(r'^form/$', hooked_server_views.form),
     url(r'^add/$', hooked_server_views.add),
+    url(r'^getjson/(\d+)/(\d+)/$', hooked_server_views.getjson),
     url(r'^jiafa/(\d+)/(\d+)/$', hooked_server_views.jiafa ,name ='add'),
-    url(r'^add/(\d+)/(\d+)/$', hooked_server_views.add2 ,name ='add'),
+    url(r'^add/(\d+)/(\d+)/$', hooked_server_views.add2 ,name ='add'),    
 ]
