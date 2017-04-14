@@ -45,7 +45,6 @@ def getBookListByGenrecode(genrecode,limit=50):
     else:
         return Book.objects.all()
 
-
 def getGenreByCode(genrecode):
     return BookGenre.objects.filter(code=genrecode)
 
@@ -57,6 +56,9 @@ def getDetailsByEpisodeid(episodeid):
 
 def getEpisodeById(episodeid):
     return BookEpisode.objects.get(id=episodeid)
+
+def getAuthorByContact(contact):
+    return BookAuthor.objects.get(contact = contact)
 ##############################
 class BookTag(models.Model):
     name = models.CharField(max_length=50) 
@@ -84,6 +86,7 @@ class Book(models.Model):
     coverImageFile = models.ImageField(upload_to='photos',blank = True,null=True)   
     backmusicFile = models.FileField(upload_to='musics' ,blank = True,null=True)  
     commentCount = models.IntegerField(u'评价数')
+    summary = models.CharField(u'简介',max_length=500,blank = True,null=True)
     ctime = models.DateTimeField(u'添加日期',auto_now = False,auto_now_add=True ) #第一次时间
     utime = models.DateTimeField(u'更新时间',auto_now = True,null=True)  #每次都变更。
     tags = models.ManyToManyField(BookTag,blank = True) 

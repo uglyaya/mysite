@@ -12,7 +12,9 @@ from django.template.context_processors import request
 from models import getBookListByGenrecode , getGenreByCode,getGenres,getDetailsByEpisodeid,getEpisodeById
 from mysite import settings
 
-#获取书籍分类列表   http://127.0.0.1:8000/genre_list/
+#获取书籍分类列表   
+#http://127.0.0.1:8000/genre_list/  
+#http://api.hooked.top/genre_list/
 def genre_list(request):
     genreSet =list( getGenres())
     result = {}
@@ -23,7 +25,9 @@ def genre_list(request):
     result['genres'] = genrelist
     return JsonResponse(result, safe=False)
     
-#根据一个分类的code获取书的列表  http://127.0.0.1:8000/book_list/?genrecode=yq
+#根据一个分类的code获取书的列表  
+# http://127.0.0.1:8000/book_list/?genrecode=yq
+# http://api.hooked.top/book_list/?genrecode=yanqin
 def book_list(request):  
     genrecode = request.GET.get('genrecode')
     genreSet = getGenreByCode(genrecode)
@@ -55,7 +59,8 @@ def book_list(request):
     result['bookresult'] = bookresult
     return JsonResponse(result, safe=False)
 
-#http://127.0.0.1:8000/book_detail/?episodeid=1
+# http://127.0.0.1:8000/book_detail/?episodeid=1
+# http://api.hooked.top/book_detail/?episodeid=1
 def book_detail(request):
     episodeid = request.GET.get('episodeid')
     episode = getEpisodeById(episodeid)

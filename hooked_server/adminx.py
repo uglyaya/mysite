@@ -34,6 +34,7 @@ class BookEpisodeAdmin(object):
 
 class BookDetailAdmin(object):
     list_display=('sender','text','book','episode','seq')
+    search_fields=[ 'book__name' ]  #增加一个搜索框
     pass
 
 class BookTagAdmin(object):
