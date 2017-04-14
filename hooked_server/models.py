@@ -3,6 +3,7 @@ from django.db import models
 from django.db.models.fields import DateField 
 from smart_selects.db_fields import ChainedForeignKey 
 from mysite import settings
+import django.utils.timezone as timezone
 # Create your models here.
 #在这里可以创建所有的表格。每个表就是一个class
 
@@ -11,7 +12,7 @@ class Person(models.Model):
     age = models.IntegerField(u'年龄')
     birthday = models.DateField(u'生日',null=True) # 可为空
     tag = models.TextField(u'标签',null=True)
-    ctime = models.DateTimeField(u'添加日期',auto_now = False,auto_now_add=True ) #第一次时间
+    ctime = models.DateTimeField(u'添加日期',default = timezone.now) #第一次时间
     utime = models.DateTimeField(u'更新时间',auto_now = True,null=True)  #每次都变更。
     class Meta:
         verbose_name = '测试per'
@@ -21,7 +22,7 @@ class Person(models.Model):
         return self.name
     
 class Author(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50) 
     qq = models.CharField(max_length=10)
     addr = models.TextField()
     email = models.EmailField() 
