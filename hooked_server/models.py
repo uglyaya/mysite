@@ -81,7 +81,7 @@ class Book(models.Model):
     name = models.CharField(u'书名',max_length=30)
     author = models.ForeignKey(BookAuthor,related_name = "author_set")
     genre = models.ForeignKey(BookGenre,related_name = "genre_set")
-    coverImageFile = models.ImageField(upload_to='photos')   
+    coverImageFile = models.ImageField(upload_to='photos',blank = True,null=True)   
     backmusicFile = models.FileField(upload_to='musics' ,blank = True,null=True)  
     commentCount = models.IntegerField(u'评价数')
     ctime = models.DateTimeField(u'添加日期',auto_now = False,auto_now_add=True ) #第一次时间
