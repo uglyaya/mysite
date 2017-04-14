@@ -4,6 +4,7 @@ from django.db.models.fields import DateField
 from smart_selects.db_fields import ChainedForeignKey 
 from mysite import settings
 import django.utils.timezone as timezone
+from colorama.ansi import Back
 # Create your models here.
 #在这里可以创建所有的表格。每个表就是一个class
 
@@ -37,14 +38,31 @@ class Article(models.Model):
 class Tag(models.Model):
     name = models.CharField(max_length=50)
     
+####################################
+def getBookListByGenrecode(genrecode,limit=50):
+    if genrecode :
+        return Book.objects.filter(genre__code = genrecode)
+    else:
+        return Book.objects.all()
 
+
+def getGenreByCode(genrecode):
+    return BookGenre.objects.filter(code=genrecode)
+
+def getGenres():
+    return BookGenre.objects.all()
+
+def getDetailsByEpisodeid(episodeid):
+    return BookDetail.objects.filter(episode__id = episodeid)
+
+def getEpisodeById(episodeid):
+    return BookEpisode.objects.get(id=episodeid)
 ##############################
 class BookTag(models.Model):
     name = models.CharField(max_length=50) 
     def __unicode__(self):# 在Python3中用 __str__ 代替 __unicode__
         return self.name
-    
-    
+        
 class BookAuthor(models.Model):
     name = models.CharField(u'作者名',max_length=30)
     contact = models.CharField(u'联系方式',max_length=100,blank = True) 
@@ -52,6 +70,7 @@ class BookAuthor(models.Model):
         return self.name
     
 class BookGenre(models.Model):
+    code = models.CharField(u'文章类型code',max_length=30)
     name = models.CharField(u'文章类型',max_length=30)
     seq = models.IntegerField(u'排序号') #越大的排越后面
 #     coverImageFile = models.CharField(u'类型封面图片',max_length=500) 
@@ -62,8 +81,8 @@ class Book(models.Model):
     name = models.CharField(u'书名',max_length=30)
     author = models.ForeignKey(BookAuthor,related_name = "author_set")
     genre = models.ForeignKey(BookGenre,related_name = "genre_set")
-    coverImageFile = models.ImageField(upload_to='photos')  
-#     coverImageFile = models.CharField(u'类型封面图片',max_length=500)
+    coverImageFile = models.ImageField(upload_to='photos')   
+    backmusicFile = models.FileField(upload_to='musics' ,blank = True,null=True)  
     commentCount = models.IntegerField(u'评价数')
     ctime = models.DateTimeField(u'添加日期',auto_now = False,auto_now_add=True ) #第一次时间
     utime = models.DateTimeField(u'更新时间',auto_now = True,null=True)  #每次都变更。
@@ -72,9 +91,18 @@ class Book(models.Model):
     def image(self):
         return '<img  src="'+settings.MEDIA_URL+'%s" class="field_img"/>' % self.coverImageFile #class="field_img" 可以显示合适的图片
 
+    def music(self):
+        if self.backmusicFile :
+            return '<audio controls="controls"  src="'+settings.MEDIA_URL+'%s" />'% self.backmusicFile
+        else:
+            return ''
+    
     image.allow_tags = True #这行不加在list页面只会显示图片地址。不会显示图片
+    music.allow_tags =True 
+    
     def __unicode__(self):
         return self.name
+     
     
 class BookEpisode(models.Model):
     name = models.CharField(u'章节名',max_length=30)
