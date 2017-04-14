@@ -14,6 +14,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os,sys
 from django.conf.global_settings import MEDIA_URL
+from mysite import settings_local
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -130,6 +131,5 @@ STATIC_URL = '/static/'
 
 MEDIA_ROOT = 'D:\\mywork\\uglyaya\\mysite\\photos\\'
 MEDIA_URL = 'http://mysite.aya.com/'
-
 
 
