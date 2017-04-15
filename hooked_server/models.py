@@ -153,6 +153,9 @@ class Book(models.Model):
             return '<audio controls="controls"  src="'+settings.MEDIA_URL+'%s" />'% self.backmusicFile
         else:
             return ''
+        
+    def alldetail(self):  #用来自定义右侧列表栏外加的内容。
+        return format_html('<a href="/xadmin/hooked_server/bookdetail/?_q_='+self.name+'">全部内容</a>')
     
     image.allow_tags = True #这行不加在list页面只会显示图片地址。不会显示图片
     music.allow_tags =True 

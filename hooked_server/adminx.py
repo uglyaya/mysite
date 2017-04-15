@@ -34,7 +34,7 @@ class BookAuthorAdmin(object):
     pass
 
 class BookAdmin(object):
-    list_display=('name','genre','author','image')
+    list_display=('name','genre','author','image','alldetail')
     search_fields=[ 'name','tags__name' ]  #增加一个搜索框
     list_filter=('genre',)
     formfield_overrides = { models.ImageField: {'widget': ImageWidget}}
@@ -52,6 +52,7 @@ class BookEpisodeAdmin(object):
 class BookDetailAdmin(object):
     list_display=('sender','text','book','episode','seq')
     search_fields=[ 'book__name' ]  #增加一个搜索框
+    ordering = ('seq',) #用作列表页的排序
     pass
 
 class BookTagAdmin(object):

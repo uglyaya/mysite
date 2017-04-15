@@ -75,7 +75,7 @@ def importBook():
         s2 = doget('http://i.zhaomistory.com/story/valid/scenes/'+str(story['id'])+'.json')
         jscene = json.loads(s2)
         seq = 1
-        for id in jscene['data']['valid_scene_ids'] :
+        for id in sorted(jscene['data']['valid_scene_ids']) :
             print id
             episode = BookEpisode(name='第%s章节'%seq,book=book,seq=seq)
             episode.save()
@@ -93,8 +93,11 @@ def importBook():
          
         
 if __name__ == '__main__':
-#     importGenre()
-#     importBook()
-    s = BookEpisode.objects.all()
-    print s.query 
+    importGenre()
+    importBook()
+#     s2 = doget('http://i.zhaomistory.com/story/valid/scenes/7.json')
+#     jscene = json.loads(s2)
+#     print jscene['data']['valid_scene_ids']
+#     for id in sorted(jscene['data']['valid_scene_ids']) :
+#         print id
     pass
