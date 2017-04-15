@@ -30,7 +30,7 @@ SECRET_KEY = 'z$3wp6zflifn%hs4^ohrk!c7ep-qx#9zri(*lorl&e+gzif7(+'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html

@@ -5,12 +5,12 @@ Created on 2017年4月14日
 @author: zhouc
 '''
 from mysite import settings
-import django,urllib2,json,urllib
-from IPython.core.release import author
+import django,urllib2,json,urllib ,sys
 django.setup() 
 from hooked_server.models import BookGenre,BookAuthor,Book, BookEpisode,\
     BookDetail
 
+print sys.path
 def doget(url):
     _USER_AGENT = "Mozilla/5.0 (Linux; U; Android 4.0.4; zh-cn; MI-ONE Plus Build/IMM76D) AppleWebKit/533.1 (KHTML, like Gecko)Version/4.0 MQQBrowser/4.4 Mobile Safari/533.1";
     httphandler = urllib2.HTTPHandler(debuglevel=1);
