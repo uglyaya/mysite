@@ -26,11 +26,12 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^xadmin/', include(xadmin.site.urls)), 
     url(r'^chaining/', include('smart_selects.urls')),
+    
     url(r'^genre_list', views.genre_list),
     url(r'^book_list', views.book_list),
     url(r'^book_detail', views.book_detail),
-    
-    
+    url(r'^user_token', views.user_token),
+    url(r'^user_readlog', views.user_readlog),
     
     url(r'^$', hooked_server_views.index),
     url(r'^form/$', hooked_server_views.form),

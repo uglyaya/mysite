@@ -3,14 +3,36 @@ from django.http import HttpResponse
 from django.http import JsonResponse 
 from django.shortcuts import render
 from hooked_server.models import Person
-from hooked_server.form import AddForm
-from django.core import serializers
+from hooked_server.form import AddForm 
 from tools import JSONEncoder
 import json
 from django.forms.models import model_to_dict
 from django.template.context_processors import request
-from models import getBookListByGenrecode , getGenreByCode,getGenres,getDetailsByEpisodeid,getEpisodeById
+from models import getBookListByGenrecode , getGenreByCode,getGenres,getDetailsByEpisodeid,getEpisodeById,BookUserInfo,saveOrUpdateBookUserReadlog
+from models import BookUserReadlog
 from mysite import settings
+
+#记录用户的token
+def user_token(request): 
+    token =request.GET['token'] 
+    if not token:
+        return JsonResponse('no token', safe=False)
+    info = BookUserInfo.objects.filter(userId=token)
+    if len (info)==0 :
+        BookUserInfo(userId=token).save()
+    return JsonResponse('ok', safe=False)
+
+#阅读点记录。
+#http://127.0.0.1:8000/user_readlog/?token=113&bookid=1&espisodeid=1
+def user_readlog(request):
+    token =request.GET['token']
+    bookid = request.GET['bookid']
+    espisodeid = request.GET['espisodeid']
+    if not token or not bookid or not espisodeid:
+        return JsonResponse('param error', safe=False)
+    saveOrUpdateBookUserReadlog(token,bookid,espisodeid)
+    return JsonResponse('ok', safe=False)
+    pass
 
 #获取书籍分类列表   
 #http://127.0.0.1:8000/genre_list/  
