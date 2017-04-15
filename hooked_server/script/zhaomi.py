@@ -93,6 +93,8 @@ def importBook():
          
         
 if __name__ == '__main__':
-    importGenre()
-    importBook()
+#     importGenre()
+#     importBook()
+    s = BookEpisode.objects.all()
+    print s.query 
     pass
