@@ -1,23 +1,36 @@
 # coding:utf-8
 import xadmin
 from xadmin import views
-from hooked_server.models import Person, Author
+from hooked_server.models import Person
+# from reversion.models import Revision
 from hooked_server.models import Book,BookAuthor,BookDetail,BookEpisode,BookGenre,BookTag
 from django.db import models
 from form_utils.widgets import ImageWidget
 # Register your models here.
  
 class PersonAdmin(object):
-    list_display=('name','age','birthday','tag','ctime','utime')
+    list_display=('name','age','birthday','tag','ctime','utime','kk')
+    
+#保存前执行 其中obj是修改后的对象，form是返回的表单（修改后的），当新建一个对象时 change = False, 当修改一个对象时 change = True
+    def save_models(self):
+        print 'aaaaaaaaaaaaaaaaaaa'
+        obj= self.new_obj
+        print self.request.user.email  #这里可以直接访问当前操作的用户信息
+        obj.save() 
+        
+    def delete_models(self):
+        print 'delete_model'
+#         super().delete_model()
 ##########################################
 
 #http://www.cnblogs.com/BeginMan/archive/2013/05/11/3072444.html  model额外属性讲解
 class BookGenreAdmin(object):
-    list_display=('name','seq')
+    list_display=('name','image','code','seq')
+    ordering = ('seq',) #用作列表页的排序
     pass
 
 class BookAuthorAdmin(object):
-    list_display=('name','contact')
+    list_display=('name','contact') 
     pass
 
 class BookAdmin(object):
@@ -25,7 +38,11 @@ class BookAdmin(object):
     search_fields=[ 'name','tags__name' ]  #增加一个搜索框
     list_filter=('genre',)
     formfield_overrides = { models.ImageField: {'widget': ImageWidget}}
-    pass
+    
+    def save_models(self): 
+        obj= self.new_obj
+        obj.operator = self.request.user.id  #这里可以直接记录当前操作的用户信息
+        obj.save() 
 
 class BookEpisodeAdmin(object):
     list_display=('name','book','seq')
@@ -52,23 +69,49 @@ class GlobalSetting(object):
 #     pass
     site_title = 'HOOKED CMS' #修改首页标题
     site_footer = '首页页脚标题'#修改首页页脚标题
-    menu_style = 'default'#'accordion'
+    menu_style = 'default' #菜单不折叠
+#     menu_style =  'accordion' #菜单折叠
      
     apps_label_title = {
         'hooked_server': u'hooked小说',
     }
     
+#     def get_nav_menu(self):  
+#         menus = super( self).get_nav_menu()  
+#        menus.append({  
+#            'menus': [{  
+#                 'url': '/admin/report',  
+#                 'icon': 'search',  
+#                 'perm': 'main.view_record',  
+#                 'title': '查看班报'  
+#            }],  
+#            'first_icon': 'calendar',  
+#            'title': u'班报查询'  
+#        })  
+#         return menus
+    
     #菜单设置
-#     def get_site_menu(self):
-#         return (
-#             {'title': '投票管理', 'perm': self.get_model_perm(Person, 'view'), 'menus':(
-#                    {'title': '投票',  'url': self.get_model_url(Person, 'view')},
-#                    {'title':'选票','url': self.get_model_url(Author, 'view')}
-#                )},
-#         )
+    def get_site_menu(self): 
+        pass
+#         print self.admin_site._registry.items()
+#         print self.admin_site._registry.items()[1]
+        
+#         del self.admin_site._registry.items()[1]
+#         print len(self.admin_site._registry.items())
+        return (
+            {'title': 'API接口', 'perm': self.get_model_perm(Book, 'view'), 'menus':(
+                    {'title': 'genre_list',  'url': 'http://api.hooked.top/genre_list/' },
+                    {'title': 'book_list',  'url': 'http://api.hooked.top/book_list/?genrecode=aiqing' },
+                    {'title': 'book_detail',  'url': 'http://api.hooked.top/book_detail/?episodeid=1' },
+#                    {'title':'BOOKGENRE','url': self.get_model_url(BookGenre, 'changelist')}
+               )}, 
+        )
+        
+#     def get_nav_menu(self):
+#         print self.get_site_menu()
     
 xadmin.site.register(views.CommAdminView, GlobalSetting)
-
+# xadmin.site.unregister(Revision)
 
 # from hooked_server.models import City, Continent,Country,Neighborhood
 # class ContinentAdmin(object):

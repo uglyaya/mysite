@@ -3,8 +3,8 @@ from django.db import models
 from django.db.models.fields import DateField 
 from smart_selects.db_fields import ChainedForeignKey 
 from mysite import settings
-import django.utils.timezone as timezone
-from colorama.ansi import Back
+import django.utils.timezone as timezone 
+from django.utils.html import format_html
 # Create your models here.
 #在这里可以创建所有的表格。每个表就是一个class
 
@@ -16,9 +16,13 @@ class Person(models.Model):
     ctime = models.DateTimeField(u'添加日期',default = timezone.now) #第一次时间
     utime = models.DateTimeField(u'更新时间',auto_now = True,null=True)  #每次都变更。
     class Meta:
-        verbose_name = '测试per'
-        verbose_name_plural = '测试person'
-        
+#         db_table ='cccc' #可以修改直接指定一个表明
+        verbose_name = '测试per' #小导航标题。http://localhost:8000/xadmin/hooked_server/person/ 可看到区别
+        verbose_name_plural = '测试person'  #大标题。
+    
+    def kk(self):  #用来自定义右侧列表栏外加的内容。
+        return format_html('<span style="">自定义 参见models</span>')
+    
     def __unicode__(self):# 在Python3中用 __str__ 代替 __unicode__
         return self.name
     
@@ -71,14 +75,20 @@ class BookAuthor(models.Model):
     def __unicode__(self):# 在Python3中用 __str__ 代替 __unicode__
         return self.name
     
+    
 class BookGenre(models.Model):
     code = models.CharField(u'文章类型code',max_length=30)
     name = models.CharField(u'文章类型',max_length=30)
     seq = models.IntegerField(u'排序号') #越大的排越后面
-#     coverImageFile = models.CharField(u'类型封面图片',max_length=500) 
+    coverImageFile = models.ImageField(upload_to='photos/genre',blank = True,null=True) 
     def __unicode__(self):# 在Python3中用 __str__ 代替 __unicode__
         return self.name
-    
+    def image(self):
+        if not self.coverImageFile :
+            return ''
+        return '<img  src="'+settings.MEDIA_URL+'%s" class="field_img"/>' % self.coverImageFile #class="field_img" 可以显示合适的图片
+    image.allow_tags = True #这行不加在list页面只会显示图片地址。不会显示图片
+
 class Book(models.Model):
     name = models.CharField(u'书名',max_length=30)
     author = models.ForeignKey(BookAuthor,related_name = "author_set")
@@ -90,6 +100,7 @@ class Book(models.Model):
     ctime = models.DateTimeField(u'添加日期',auto_now = False,auto_now_add=True ) #第一次时间
     utime = models.DateTimeField(u'更新时间',auto_now = True,null=True)  #每次都变更。
     tags = models.ManyToManyField(BookTag,blank = True) 
+    operator =  models.CharField(u'操作人',max_length=30,blank = True,null=True) #存储最后操作人id
     
     def image(self):
         return '<img  src="'+settings.MEDIA_URL+'%s" class="field_img"/>' % self.coverImageFile #class="field_img" 可以显示合适的图片
@@ -119,6 +130,8 @@ class BookDetail(models.Model):
     text = models.CharField(u'text',max_length=500)
     seq = models.IntegerField(u'排序号') #越大的排越后面
     book = models.ForeignKey(Book)
+    textImageFile = models.ImageField(upload_to='photos/text',blank = True,null=True)   
+
 #     episode = models.ForeignKey(BookEpisode)
     episode = ChainedForeignKey(
         BookEpisode, 

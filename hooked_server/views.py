@@ -21,13 +21,18 @@ def genre_list(request):
     result['count'] = len(genreSet)
     genrelist = []
     for genre in genreSet :
-        genrelist.append({ 'code':genre.code,'name':genre.name})
+        genrelist.append({ 
+            'code':genre.code,
+            'name':genre.name,
+            'seq':genre.seq,
+            'coverImageFile': settings.MEDIA_URL + str(genre.coverImageFile) if genre.coverImageFile else '',
+            })
     result['genres'] = genrelist
     return JsonResponse(result, safe=False)
     
 #根据一个分类的code获取书的列表  
-# http://127.0.0.1:8000/book_list/?genrecode=yq
-# http://api.hooked.top/book_list/?genrecode=yanqin
+# http://127.0.0.1:8000/book_list/?genrecode=aiqing
+# http://api.hooked.top/book_list/?genrecode=aiqing
 def book_list(request):  
     genrecode = request.GET.get('genrecode')
     genreSet = getGenreByCode(genrecode)
@@ -41,6 +46,7 @@ def book_list(request):
             'name':book.name,
             'author':book.author.name,
             'genre':book.genre.name,
+            'summary':book.summary,
             'coverImageFile': settings.MEDIA_URL + str(book.coverImageFile) if book.coverImageFile else '',
             'backmusicFile':   settings.MEDIA_URL + str(book.backmusicFile) if book.backmusicFile else '',
             'commentCount':book.commentCount,
@@ -56,7 +62,7 @@ def book_list(request):
     result['genrecode'] = genrecode
     result['genrename'] = genre.name
     result['bookcount'] = len(books)
-    result['bookresult'] = bookresult
+    result['books'] = bookresult
     return JsonResponse(result, safe=False)
 
 # http://127.0.0.1:8000/book_detail/?episodeid=1
@@ -74,6 +80,7 @@ def book_detail(request):
     result['detailcount'] =len(details)
     result['authorid'] = episode.book.author.id
     result['authorname'] = episode.book.author.name
+    result['summary'] = episode.book.summary 
     result['commentCount'] =episode.book.commentCount
     result['coverImageFile'] = settings.MEDIA_URL + str(episode.book.coverImageFile) if episode.book.coverImageFile else ''  
     result['backmusicFile'] =  settings.MEDIA_URL + str(episode.book.backmusicFile) if episode.book.backmusicFile else '' 
@@ -83,6 +90,7 @@ def book_detail(request):
                 'sender':detail.sender,
                 'text':detail.text,
                 'seq':detail.seq,
+                'img':settings.MEDIA_URL + str(detail.textImageFile) if detail.textImageFile else '',
             })
     result['details'] =detailresult
     return JsonResponse(result, safe=False)
