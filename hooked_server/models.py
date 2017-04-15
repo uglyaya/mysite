@@ -44,13 +44,12 @@ class Tag(models.Model):
     name = models.CharField(max_length=50)
     
 ####################################
-def saveOrUpdateBookUserReadlog(userid,bookid,espisodeid):
+def saveOrUpdateBookUserReadlog(userid,espisodeid):
     info = BookUserReadlog.objects.filter(userId=userid)  
     if not info or len (info)==0 :
-        BookUserReadlog(userId=userid,bookid=bookid,espisodeid=espisodeid).save()
+        BookUserReadlog(userId=userid,espisodeid=espisodeid).save()
     else:
-        log = info[0]
-        log.bookid=bookid
+        log = info[0] 
         log.espisodeid=espisodeid
         log.save()
  
@@ -94,8 +93,7 @@ class BookUserInfo(models.Model):
         return models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
 class BookUserReadlog(models.Model):
-    userId =models.CharField(u'用户id',max_length=32) # jpush使用。目前是存储jpush上传上来的RegistrationID
-    bookid =models.IntegerField(u'书id',default=0)
+    userId =models.CharField(u'用户id',max_length=32) # jpush使用。目前是存储jpush上传上来的RegistrationID 
     espisodeid =models.IntegerField(u'书id',default=0)
     utime = models.DateTimeField(u'更新时间',auto_now = True,null=True)  #每次都变更。
     st = models.IntegerField(u'状态',default=0) #缺省0，删除-1

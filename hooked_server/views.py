@@ -25,12 +25,11 @@ def user_token(request):
 #阅读点记录。
 #http://127.0.0.1:8000/user_readlog/?token=113&bookid=1&espisodeid=1
 def user_readlog(request):
-    token =request.GET['token']
-    bookid = request.GET['bookid']
+    token =request.GET['token'] 
     espisodeid = request.GET['espisodeid']
-    if not token or not bookid or not espisodeid:
+    if not token  or not espisodeid:
         return JsonResponse('param error', safe=False)
-    saveOrUpdateBookUserReadlog(token,bookid,espisodeid)
+    saveOrUpdateBookUserReadlog(token,espisodeid)
     return JsonResponse('ok', safe=False)
     pass
 
