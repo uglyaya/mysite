@@ -5,10 +5,15 @@ from smart_selects.db_fields import ChainedForeignKey
 from mysite import settings
 import django.utils.timezone as timezone 
 from django.utils.html import format_html
-import hashlib
+import hashlib,time
+from bson.json_util import default
 # Create your models here.
 #在这里可以创建所有的表格。每个表就是一个class
 
+ST_CHOICES = (
+    (0, u'正常'),
+    (-1, u'删除'),
+)
 class Person(models.Model):
     name = models.CharField(u'姓名',max_length=30)
     age = models.IntegerField(u'年龄')
@@ -128,7 +133,7 @@ class BookGenre(models.Model):
     seq = models.IntegerField(u'排序号') #越大的排越后面
     coverImageFile = models.ImageField(upload_to='photos/genre',blank = True,null=True) 
     country = models.CharField(u'国家',default='CN',max_length=4,choices=COUNTRY_CHOICES)
-    st = models.IntegerField(u'状态',default=0) #缺省0，删除-1
+    st = models.IntegerField(u'状态',default=0,choices=ST_CHOICES) #缺省0，删除-1
     def __unicode__(self):
         return self.name
     def image(self):
@@ -146,13 +151,13 @@ class Book(models.Model):
     genre = models.ForeignKey(BookGenre,related_name = "genre_set")
     coverImageFile = models.ImageField(upload_to='photos',blank = True,null=True)   
     backmusicFile = models.FileField(upload_to='musics' ,blank = True,null=True)  
-    commentCount = models.IntegerField(u'评价数')
+    commentCount = models.IntegerField(u'评价数',default=100)
     summary = models.CharField(u'简介',max_length=500,blank = True,null=True)
     ctime = models.DateTimeField(u'添加日期',auto_now = False,auto_now_add=True ) #第一次时间
     utime = models.DateTimeField(u'更新时间',auto_now = True,null=True)  #每次都变更。
     tags = models.ManyToManyField(BookTag,blank = True) 
     operator =  models.CharField(u'操作人',max_length=30,blank = True,null=True) #存储最后操作人id
-    st = models.IntegerField(u'状态',default=0) #缺省0，删除-1
+    st = models.IntegerField(u'状态',default=0,choices=ST_CHOICES) #缺省0，删除-1
     
     def image(self):
         return '<img  src="'+settings.MEDIA_URL+'%s" class="field_img"/>' % self.coverImageFile #class="field_img" 可以显示合适的图片
@@ -177,17 +182,17 @@ class BookEpisode(models.Model):
     name = models.CharField(u'章节名',max_length=30)
     seq = models.IntegerField(u'排序号') #越大的排越后面
     book = models.ForeignKey(Book)
-    st = models.IntegerField(u'状态',default=0) #缺省0，删除-1
+    st = models.IntegerField(u'状态',default=0,choices=ST_CHOICES) #缺省0，删除-1
     def __unicode__(self):# 在Python3中用 __str__ 代替 __unicode__
         return self.name
     
 class BookDetail(models.Model):
     sender = models.CharField(u'sender',max_length=30)
     text = models.CharField(u'text',max_length=500)
-    seq = models.IntegerField(u'排序号') #越大的排越后面
+    seq = models.IntegerField(u'排序号',default=time.time()) #越大的排越后面
     book = models.ForeignKey(Book)
     textImageFile = models.ImageField(upload_to='photos/text',blank = True,null=True)   
-    st = models.IntegerField(u'状态',default=0) #缺省0，删除-1
+    st = models.IntegerField(u'状态',default=0,choices=ST_CHOICES) #缺省0，删除-1
 
 #     episode = models.ForeignKey(BookEpisode)
     episode = ChainedForeignKey(
