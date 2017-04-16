@@ -63,8 +63,8 @@ def getBookListByGenrecode(genrecode,limit=50):
 def getGenreByCode(genrecode):
     return BookGenre.objects.filter(code=genrecode)
 
-def getGenres():
-    return BookGenre.objects.all()
+def getGenres(country):
+    return BookGenre.objects.filter(country=country,st=0)
 
 def getDetailsByEpisodeid(episodeid):
     return BookDetail.objects.filter(episode__id = episodeid)
@@ -105,6 +105,7 @@ class BookUserReadlog(models.Model):
         self.partId = hashlib.md5(self.userId).hexdigest()[-2:]
         return models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
+ 
 class BookTag(models.Model):
     name = models.CharField(max_length=50) 
     def __unicode__(self):
@@ -118,10 +119,15 @@ class BookAuthor(models.Model):
     
     
 class BookGenre(models.Model):
+    COUNTRY_CHOICES = (
+        (u'CN', u'中国'),
+        (u'JP' , u'日本'),
+    )
     code = models.CharField(u'文章类型code',max_length=30)
-    name = models.CharField(u'文章类型',max_length=30)
+    name = models.CharField(u'分类名称',max_length=30)
     seq = models.IntegerField(u'排序号') #越大的排越后面
     coverImageFile = models.ImageField(upload_to='photos/genre',blank = True,null=True) 
+    country = models.CharField(u'国家',default='CN',max_length=4,choices=COUNTRY_CHOICES)
     st = models.IntegerField(u'状态',default=0) #缺省0，删除-1
     def __unicode__(self):
         return self.name
@@ -130,6 +136,9 @@ class BookGenre(models.Model):
             return ''
         return '<img  src="'+settings.MEDIA_URL+'%s" class="field_img"/>' % self.coverImageFile #class="field_img" 可以显示合适的图片
     image.allow_tags = True #这行不加在list页面只会显示图片地址。不会显示图片
+    
+    def books(self):  #用来自定义右侧列表栏外加的内容。
+        return format_html('<a href="/xadmin/hooked_server/book/?_p_genre__id__exact='+str(self.id)+'">全部书</a>')
 
 class Book(models.Model):
     name = models.CharField(u'书名',max_length=30)

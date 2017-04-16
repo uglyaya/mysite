@@ -34,10 +34,11 @@ def user_readlog(request):
     pass
 
 #获取书籍分类列表   
-#http://127.0.0.1:8000/genre_list/  
-#http://api.hooked.top/genre_list/
+#http://127.0.0.1:8000/genre_list/?country=CN
+#http://api.hooked.top/genre_list/?country=CN
 def genre_list(request):
-    genreSet =list( getGenres())
+    country = request.GET.get('country')
+    genreSet =list( getGenres(country))
     result = {}
     result['count'] = len(genreSet)
     genrelist = []
@@ -46,6 +47,7 @@ def genre_list(request):
             'code':genre.code,
             'name':genre.name,
             'seq':genre.seq,
+            'country':genre.country,
             'coverImageFile': settings.MEDIA_URL + str(genre.coverImageFile) if genre.coverImageFile else '',
             })
     result['genres'] = genrelist
