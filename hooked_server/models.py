@@ -8,6 +8,7 @@ from django.utils.html import format_html
 import hashlib,time
 from bson.json_util import default
 from _mysql import NULL
+from django.contrib.admin.utils import help_text_for_field
 # Create your models here.
 #在这里可以创建所有的表格。每个表就是一个class
 
@@ -143,6 +144,9 @@ class BookGenre(models.Model):
     name = models.CharField(u'分类名称',max_length=30)
     seq = models.IntegerField(u'排序号',default=0) #越大的排越后面
     coverImageFile = models.ImageField(upload_to='photos/genre',blank = True,null=True) 
+    backColor = models.CharField(u'背景颜色',max_length=10,blank = True, default='#0000FF')
+    fontColor = models.CharField(u'字体颜色',max_length=10,blank = True, default='#FFFFFF' ,
+                                 help_text='分类字体的颜色，采用#FFEEBB这个格式。<a href="http://tool.oschina.net/commons?type=3">色表对照</a>')
     country = models.CharField(u'国家',default='CN',max_length=4,choices=COUNTRY_CHOICES)
     st = models.IntegerField(u'状态',default=0,choices=ST_CHOICES) #缺省0，删除-1
     def __unicode__(self):
