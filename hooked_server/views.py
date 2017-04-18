@@ -81,8 +81,8 @@ def book_list(request):
             'utime':book.utime,
             'tagscount':book.tags.count(),
             'tags': [model_to_dict(item) for item in book.tags.all() ],
-            'episodeCount': len(book.bookepisode_set.all()),
-            'episodes': [model_to_dict(item) for item in book.bookepisode_set.all() ], #通过主表获取子表下面的list
+            'episodeCount': len(book.episode_set.all()),
+            'episodes': [model_to_dict(item) for item in book.episode_set.all() ], #通过主表获取子表下面的list
             })
     genre = genreSet[0]
     result ={} 
