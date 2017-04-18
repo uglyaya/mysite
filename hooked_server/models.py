@@ -181,10 +181,10 @@ class Book(models.Model):
         return '<audio controls="controls"  src="%s" />'%(musicurl if  musicurl else self.backmusicPath) 
         
     def alldetail(self):  #用来自定义右侧列表栏外加的内容。
-        return format_html('<a href="/xadmin/hooked_server/bookdetail/?_q_='+self.name+'">全部内容</a>')
+        return format_html('<a href="/xadmin/hooked_server/bookdetail/?_q_='+str(self.id)+'">全部内容</a>')
     
     def allepisode(self):
-        return format_html('<a href="/xadmin/hooked_server/bookepisode/?_q_='+self.name+'">全部章节</a>')
+        return format_html('<a href="/xadmin/hooked_server/bookepisode/?_q_='+str(self.id)+'">全部章节</a>')
     
     image.allow_tags = True #这行不加在list页面只会显示图片地址。不会显示图片
     music.allow_tags =True 
@@ -218,6 +218,9 @@ class BookDetail(models.Model):
         auto_choose=True,
         sort=True)
 
+    def alldetail(self):  #用来自定义右侧列表栏外加的内容。
+        return format_html('<a href="/xadmin/hooked_server/bookdetail/?_q_='+str(self.id)+'">全部内容</a>')
+    
 #     imageFile = models.CharField(u'内容图片',max_length=500)
     def __unicode__(self):# 在Python3中用 __str__ 代替 __unicode__
         return self.sender

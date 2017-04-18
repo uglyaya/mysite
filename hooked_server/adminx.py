@@ -47,12 +47,13 @@ class BookAdmin(object):
 
 class BookEpisodeAdmin(object):
     list_display=('name','book','seq')
-    search_fields=[ 'book__name' ]  #增加一个搜索框
+    search_fields=[ '=book__id' ]  #增加一个搜索框
+    ordering = ('seq',) #用作列表页的排序
     pass
 
 class BookDetailAdmin(object):
     list_display=('sender','text','book','episode','seq')
-    search_fields=[ 'book__name' ]  #增加一个搜索框
+    search_fields=[ '=book__id' ]  #增加一个搜索框
     ordering = ('seq',) #用作列表页的排序
     pass
 
