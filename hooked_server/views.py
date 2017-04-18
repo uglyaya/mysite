@@ -51,6 +51,8 @@ def genre_list(request):
             'seq':genre.seq,
             'country':genre.country,
             'coverImageFile': settings.MEDIA_URL + str(genre.coverImageFile) if genre.coverImageFile else '',
+            'fontColor':genre.fontColor,
+            'backColor':genre.backColor,
             })
     result['genres'] = genrelist
     return JsonResponse(result, safe=False)
