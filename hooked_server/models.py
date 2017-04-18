@@ -197,7 +197,9 @@ class BookEpisode(models.Model):
     name = models.CharField(u'章节名',max_length=500)
     seq = models.IntegerField(u'排序号') #越大的排越后面
     book = models.ForeignKey(Book)
-    st = models.IntegerField(u'状态',default=0,choices=ST_CHOICES) #缺省0，删除-1
+    st = models.IntegerField(u'状态',default=0,choices=ST_CHOICES) #缺省0，删除-1 
+    def alldetail(self):  #用来自定义右侧列表栏外加的内容。
+        return format_html('<a href="/xadmin/hooked_server/bookdetail/?_q_='+str(self.id)+'">全部内容</a>')
     def __unicode__(self):# 在Python3中用 __str__ 代替 __unicode__
         return self.name
     
@@ -217,9 +219,6 @@ class BookDetail(models.Model):
         show_all=False, 
         auto_choose=True,
         sort=True)
-
-    def alldetail(self):  #用来自定义右侧列表栏外加的内容。
-        return format_html('<a href="/xadmin/hooked_server/bookdetail/?_q_='+str(self.id)+'">全部内容</a>')
     
 #     imageFile = models.CharField(u'内容图片',max_length=500)
     def __unicode__(self):# 在Python3中用 __str__ 代替 __unicode__
