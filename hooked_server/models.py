@@ -7,13 +7,11 @@ import django.utils.timezone as timezone
 from django.utils.html import format_html
 import hashlib,time
 from bson.json_util import default
+from _mysql import NULL
 # Create your models here.
 #在这里可以创建所有的表格。每个表就是一个class
 
-ST_CHOICES = (
-    (0, u'正常'),
-    (-1, u'删除'),
-)
+
 class Person(models.Model):
     name = models.CharField(u'姓名',max_length=30)
     age = models.IntegerField(u'年龄')
@@ -49,15 +47,27 @@ class Tag(models.Model):
     name = models.CharField(max_length=50)
     
 ####################################
-def saveOrUpdateBookUserReadlog(userid,espisodeid):
+ST_CHOICES = (
+    (0, u'正常'),
+    (-1, u'删除'),
+)
+
+#获取同一本书book的后一个章节Episode
+def getNextEpisodeId(bookid,episodeid):
+    result = BookEpisode.objects.filter(book__id = bookid,id__gt = episodeid).order_by('id') 
+    if not result or len(result) ==0:
+        return 0
+    else:
+        return result[0].id
+
+def saveOrUpdateBookUserReadlog(userid,detailid):
     info = BookUserReadlog.objects.filter(userId=userid)  
     if not info or len (info)==0 :
-        BookUserReadlog(userId=userid,espisodeid=espisodeid).save()
+        BookUserReadlog(userId=userid,detailId=detailid).save()
     else:
         log = info[0] 
-        log.espisodeid=espisodeid
-        log.save()
- 
+        log.detailId=detailid
+        log.save() 
 
 def getBookListByGenrecode(genrecode,limit=50):
     if genrecode :
@@ -99,7 +109,7 @@ class BookUserInfo(models.Model):
 
 class BookUserReadlog(models.Model):
     userId =models.CharField(u'用户id',max_length=32) # jpush使用。目前是存储jpush上传上来的RegistrationID 
-    espisodeid =models.IntegerField(u'书id',default=0)
+    detailId =models.IntegerField(u'书id',default=0)
     utime = models.DateTimeField(u'更新时间',auto_now = True,null=True)  #每次都变更。
     st = models.IntegerField(u'状态',default=0) #缺省0，删除-1
     partId =models.CharField(u'用户分区id',max_length=2) # 为以后数据库分表，把md5（RegistrationID）截取后2位存储。
@@ -127,10 +137,11 @@ class BookGenre(models.Model):
     COUNTRY_CHOICES = (
         (u'CN', u'中国'),
         (u'JP' , u'日本'),
+        (u'en' , u'美国'),
     )
     code = models.CharField(u'文章类型code',max_length=30)
     name = models.CharField(u'分类名称',max_length=30)
-    seq = models.IntegerField(u'排序号') #越大的排越后面
+    seq = models.IntegerField(u'排序号',default=0) #越大的排越后面
     coverImageFile = models.ImageField(upload_to='photos/genre',blank = True,null=True) 
     country = models.CharField(u'国家',default='CN',max_length=4,choices=COUNTRY_CHOICES)
     st = models.IntegerField(u'状态',default=0,choices=ST_CHOICES) #缺省0，删除-1
@@ -138,8 +149,8 @@ class BookGenre(models.Model):
         return self.name
     def image(self):
         if not self.coverImageFile :
-            return ''
-        return '<img  src="'+settings.MEDIA_URL+'%s" class="field_img"/>' % self.coverImageFile #class="field_img" 可以显示合适的图片
+            return ''            
+        return '<img  src="'+settings.MEDIA_URL if not self.coverImageFile.startswith('http') else ''+'%s" class="field_img"/>' % self.coverImageFile #class="field_img" 可以显示合适的图片
     image.allow_tags = True #这行不加在list页面只会显示图片地址。不会显示图片
     
     def books(self):  #用来自定义右侧列表栏外加的内容。
@@ -149,8 +160,10 @@ class Book(models.Model):
     name = models.CharField(u'书名',max_length=30)
     author = models.ForeignKey(BookAuthor,related_name = "author_set")
     genre = models.ForeignKey(BookGenre,related_name = "genre_set")
-    coverImageFile = models.ImageField(upload_to='photos',blank = True,null=True)   
-    backmusicFile = models.FileField(upload_to='musics' ,blank = True,null=True)  
+    coverImageFile = models.ImageField(upload_to='photos',blank = True,null=True,max_length=500)   
+    coverImagePath = models.CharField(u'图片绝对地址',blank = True,null=True,max_length=500)   
+    backmusicFile = models.FileField(upload_to='musics' ,blank = True,null=True,max_length=500)  
+    backmusicPath = models.CharField(u'声音绝对地址',blank = True,null=True,max_length=500)   
     commentCount = models.IntegerField(u'评价数',default=100)
     summary = models.CharField(u'简介',max_length=500,blank = True,null=True)
     ctime = models.DateTimeField(u'添加日期',auto_now = False,auto_now_add=True ) #第一次时间
@@ -160,13 +173,12 @@ class Book(models.Model):
     st = models.IntegerField(u'状态',default=0,choices=ST_CHOICES) #缺省0，删除-1
     
     def image(self):
-        return '<img  src="'+settings.MEDIA_URL+'%s" class="field_img"/>' % self.coverImageFile #class="field_img" 可以显示合适的图片
+        imgurl = settings.MEDIA_URL+str(self.coverImageFile) if  self.coverImageFile else ''
+        return '<img  src="%s" class="field_img"/>' % (imgurl if  imgurl else self.coverImagePath) #class="field_img" 可以显示合适的图片
 
     def music(self):
-        if self.backmusicFile :
-            return '<audio controls="controls"  src="'+settings.MEDIA_URL+'%s" />'% self.backmusicFile
-        else:
-            return ''
+        musicurl =  settings.MEDIA_URL+str(self.backmusicFile) if  self.backmusicFile else ''
+        return '<audio controls="controls"  src="%s" />'%(musicurl if  musicurl else self.backmusicPath) 
         
     def alldetail(self):  #用来自定义右侧列表栏外加的内容。
         return format_html('<a href="/xadmin/hooked_server/bookdetail/?_q_='+self.name+'">全部内容</a>')
@@ -179,7 +191,7 @@ class Book(models.Model):
      
     
 class BookEpisode(models.Model):
-    name = models.CharField(u'章节名',max_length=30)
+    name = models.CharField(u'章节名',max_length=500)
     seq = models.IntegerField(u'排序号') #越大的排越后面
     book = models.ForeignKey(Book)
     st = models.IntegerField(u'状态',default=0,choices=ST_CHOICES) #缺省0，删除-1
@@ -192,8 +204,8 @@ class BookDetail(models.Model):
     seq = models.IntegerField(u'排序号',default=time.time()) #越大的排越后面
     book = models.ForeignKey(Book)
     textImageFile = models.ImageField(upload_to='photos/text',blank = True,null=True)   
+    textImagePath = models.CharField(u'图片绝对地址',blank = True,null=True,max_length=500)   
     st = models.IntegerField(u'状态',default=0,choices=ST_CHOICES) #缺省0，删除-1
-
 #     episode = models.ForeignKey(BookEpisode)
     episode = ChainedForeignKey(
         BookEpisode, 

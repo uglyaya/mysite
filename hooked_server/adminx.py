@@ -101,11 +101,12 @@ class GlobalSetting(object):
 #         del self.admin_site._registry.items()[1]
 #         print len(self.admin_site._registry.items())
         return (
-            {'title': 'API接口', 'perm': self.get_model_perm(Book, 'view'), 'menus':(
-                    {'title': 'genre_list',  'url': 'http://api.hooked.top/genre_list/' },
-                    {'title': 'book_list',  'url': 'http://api.hooked.top/book_list/?genrecode=aiqing' },
-                    {'title': 'book_detail',  'url': 'http://api.hooked.top/book_detail/?episodeid=1' },
-#                    {'title':'BOOKGENRE','url': self.get_model_url(BookGenre, 'changelist')}
+            {'title': 'API接口demo', 'perm': self.get_model_perm(Book, 'view'), 'menus':(
+                    {'title': 'genre_list',  'url': '/genre_list/?country=CN' },
+                    {'title': 'book_list',  'url': '/book_list/?genrecode=aiqing' },
+                    {'title': 'book_detail',  'url': '/book_detail/?episodeid=1' },
+                    {'title': 'user_token',  'url': '/user_token/?token=xxxx' },
+                    {'title': 'user_readlog',  'url': '/user_readlog/?token=xxxx&detailid=1' }, 
                )}, 
         )
         

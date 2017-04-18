@@ -6,13 +6,15 @@ from hooked_server.models import Person
 from hooked_server.form import AddForm 
 from tools import JSONEncoder
 import json
-from django.forms.models import model_to_dict
+from django.forms.models import model_to_dict 
 from django.template.context_processors import request
-from models import getBookListByGenrecode , getGenreByCode,getGenres,getDetailsByEpisodeid,getEpisodeById,BookUserInfo,saveOrUpdateBookUserReadlog
+from models import  getNextEpisodeId,getBookListByGenrecode , getGenreByCode,getGenres,getDetailsByEpisodeid,getEpisodeById,BookUserInfo,saveOrUpdateBookUserReadlog
 from models import BookUserReadlog
 from mysite import settings
 
 #记录用户的token
+#http://127.0.0.1:8000/user_token/?token=113xx
+# http://api.hooked.top/user_token/?token=xxxx
 def user_token(request): 
     token =request.GET['token'] 
     if not token:
@@ -23,13 +25,13 @@ def user_token(request):
     return JsonResponse('ok', safe=False)
 
 #阅读点记录。
-#http://127.0.0.1:8000/user_readlog/?token=113&bookid=1&espisodeid=1
+#http://127.0.0.1:8000/user_readlog/?token=113&detailid=1
 def user_readlog(request):
     token =request.GET['token'] 
-    espisodeid = request.GET['espisodeid']
-    if not token  or not espisodeid:
+    detailid = request.GET['detailid']
+    if not token  or not detailid:
         return JsonResponse('param error', safe=False)
-    saveOrUpdateBookUserReadlog(token,espisodeid)
+    saveOrUpdateBookUserReadlog(token,detailid)
     return JsonResponse('ok', safe=False)
     pass
 
@@ -106,7 +108,8 @@ def book_detail(request):
     result['summary'] = episode.book.summary 
     result['commentCount'] =episode.book.commentCount
     result['coverImageFile'] = settings.MEDIA_URL + str(episode.book.coverImageFile) if episode.book.coverImageFile else ''  
-    result['backmusicFile'] =  settings.MEDIA_URL + str(episode.book.backmusicFile) if episode.book.backmusicFile else '' 
+    result['backmusicFile'] =  settings.MEDIA_URL + str(episode.book.backmusicFile) if episode.book.backmusicFile else ''
+    result['nextEpisodeid'] = getNextEpisodeId(episode.book.id,episodeid)
     for detail in details:
         detailresult.append({
                 'id':detail.id,
