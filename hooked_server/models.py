@@ -56,9 +56,9 @@ ST_CHOICES = (
 def getNextEpisodeId(bookid,episodeid):
     result = BookEpisode.objects.filter(book__id = bookid,id__gt = episodeid).order_by('id') 
     if not result or len(result) ==0:
-        return 0
+        return 0,''
     else:
-        return result[0].id
+        return result[0].id,result[0].name
 
 def saveOrUpdateBookUserReadlog(userid,detailid):
     info = BookUserReadlog.objects.filter(userId=userid)  
@@ -181,7 +181,7 @@ class Book(models.Model):
         return '<audio controls="controls"  src="%s" />'%(musicurl if  musicurl else self.backmusicPath) 
     
     def allepisode(self):
-        return format_html('<a href="/xadmin/hooked_server/bookepisode/?_q_='+str(self.id)+'">全部章节('+str(len(self.episode_set.all()))+')</a>')
+        return format_html('<a href="/xadmin/hooked_server/bookepisode/?_q_='+str(self.id)+'">全部章节('+str(len(self.episode_set.all()))+'章)</a>')
     
     image.allow_tags = True #这行不加在list页面只会显示图片地址。不会显示图片
     music.allow_tags =True 

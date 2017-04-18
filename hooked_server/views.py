@@ -109,7 +109,9 @@ def book_detail(request):
     result['commentCount'] =episode.book.commentCount
     result['coverImageFile'] = settings.MEDIA_URL + str(episode.book.coverImageFile) if episode.book.coverImageFile else ''  
     result['backmusicFile'] =  settings.MEDIA_URL + str(episode.book.backmusicFile) if episode.book.backmusicFile else ''
-    result['nextEpisodeid'] = getNextEpisodeId(episode.book.id,episodeid)
+    nextepisodeid,nextepisodename =getNextEpisodeId(episode.book.id,episodeid)
+    result['nextEpisodeid'] = nextepisodeid
+    result['nextEpisodename'] = nextepisodename
     for detail in details:
         detailresult.append({
                 'id':detail.id,
