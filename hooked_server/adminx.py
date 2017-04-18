@@ -35,7 +35,7 @@ class BookAuthorAdmin(object):
     pass
 
 class BookAdmin(object):
-    list_display=('name','genre','author','image','allspisode','alldetail')
+    list_display=('name','genre','author','image','allepisode','alldetail')
     search_fields=[ 'name','tags__name' ]  #增加一个搜索框
     list_filter=('genre',)
     formfield_overrides = { models.ImageField: {'widget': ImageWidget}}
