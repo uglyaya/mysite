@@ -25,7 +25,7 @@ class PersonAdmin(object):
 
 #http://www.cnblogs.com/BeginMan/archive/2013/05/11/3072444.html  model额外属性讲解
 class BookGenreAdmin(object):
-    list_display=('name','image','country','code','seq','books')
+    list_display=('name','books','country','code','seq','image')
     list_filter=('country',)
     ordering = ('seq',) #用作列表页的排序
     pass

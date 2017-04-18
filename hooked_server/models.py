@@ -154,7 +154,7 @@ class BookGenre(models.Model):
     image.allow_tags = True #这行不加在list页面只会显示图片地址。不会显示图片
     
     def books(self):  #用来自定义右侧列表栏外加的内容。
-        return format_html('<a href="/xadmin/hooked_server/book/?_p_genre__id__exact='+str(self.id)+'">全部书</a>')
+        return format_html('<a href="/xadmin/hooked_server/book/?_p_genre__id__exact='+str(self.id)+'">全部书('+str(len(self.genre_set.all()))+'本)</a>')
 
 class Book(models.Model):
     name = models.CharField(u'书名',max_length=30)
@@ -179,9 +179,6 @@ class Book(models.Model):
     def music(self):
         musicurl =  settings.MEDIA_URL+str(self.backmusicFile) if  self.backmusicFile else ''
         return '<audio controls="controls"  src="%s" />'%(musicurl if  musicurl else self.backmusicPath) 
-        
-    def alldetail(self):  #用来自定义右侧列表栏外加的内容。
-        return format_html('<a href="/xadmin/hooked_server/bookdetail/?_q_='+str(self.id)+'">全部内容</a>')
     
     def allepisode(self):
         return format_html('<a href="/xadmin/hooked_server/bookepisode/?_q_='+str(self.id)+'">全部章节('+str(len(self.episode_set.all()))+')</a>')
