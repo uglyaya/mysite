@@ -136,9 +136,9 @@ class BookAuthor(models.Model):
     
 class BookGenre(models.Model):
     COUNTRY_CHOICES = (
-        (u'CN', u'中国'),
-        (u'JP' , u'日本'),
-        (u'en' , u'美国'),
+        (u'zh', u'中文'),
+        (u'jp' , u'日语'),
+        (u'en' , u'英语'),
     )
     code = models.CharField(u'文章类型code',max_length=30)
     name = models.CharField(u'分类名称',max_length=30)

@@ -36,8 +36,8 @@ def user_readlog(request):
     pass
 
 #获取书籍分类列表   
-#http://127.0.0.1:8000/genre_list/?country=CN
-#http://api.hooked.top/genre_list/?country=CN
+#http://127.0.0.1:8000/genre_list/?country=zh
+#http://api.hooked.top/genre_list/?country=zh
 def genre_list(request):
     country = request.GET.get('country')
     genreSet =list( getGenres(country))
