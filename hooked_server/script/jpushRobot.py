@@ -11,7 +11,8 @@ sys.path.append('/home/ec2-user/mysite/')
 sys.path.append('/home/ec2-user/mysite/hooked_server/script/')
 print sys.path
 from mysite import settings
-import django,json,datetime
+import django,json,datetime,os
+os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.settings'
 django.setup()
 import jpush as jpush
 from jpush import common
