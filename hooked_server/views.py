@@ -49,6 +49,10 @@ def user_readlog(request):
 #http://api.hooked.top/genre_list/?country=zh
 def genre_list(request):
     country = request.GET.get('country')
+    if not country :
+        country = 'zh-Hans'
+    if country == 'zh-Hans-CN':
+        country = 'zh-Hans'
     genreSet =list( getGenres(country))
     result = {}
     result['count'] = len(genreSet)

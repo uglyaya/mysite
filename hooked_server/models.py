@@ -121,8 +121,8 @@ class BookAuthor(models.Model):
         
 class BookGenre(models.Model):
     COUNTRY_CHOICES = (
-        (u'zh-Hans-CN', u'中文'),
-        (u'jp' , u'日语'),
+        (u'zh-Hans', u'中文'),
+        (u'ja' , u'日语'),
         (u'en' , u'英语'),
     )
     code = models.CharField(u'文章类型code',max_length=30)
@@ -132,7 +132,7 @@ class BookGenre(models.Model):
     backColor = models.CharField(u'背景颜色',max_length=10,blank = True, default='#0000FF')
     fontColor = models.CharField(u'字体颜色',max_length=10,blank = True, default='#FFFFFF' ,
                                  help_text='分类字体的颜色，采用#FFEEBB这个格式。<a href="http://tool.oschina.net/commons?type=3">色表对照</a>')
-    country = models.CharField(u'国家',default='zh-Hans-CN',max_length=20,choices=COUNTRY_CHOICES)
+    country = models.CharField(u'国家',default='zh',max_length=20,choices=COUNTRY_CHOICES)
     st = models.IntegerField(u'状态',default=0,choices=ST_CHOICES) #缺省0，删除-1
     def __unicode__(self):
         return self.name
