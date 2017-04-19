@@ -51,7 +51,7 @@ def genre_list(request):
     country = request.GET.get('country')
     if not country :
         country = 'en'
-    if len(country.split('-'))>2:
+    if len(country.split('-'))>1:
         country = country[0: country.rindex('-')] 
     genreSet =list( getGenres(country))
     result = {}
