@@ -1,14 +1,10 @@
 # -*- coding: UTF-8 -*-
-from django.db import models 
-from django.db.models.fields import DateField 
+from django.db import models  
 from smart_selects.db_fields import ChainedForeignKey 
 from mysite import settings
 import django.utils.timezone as timezone 
 from django.utils.html import format_html
-import hashlib,time
-from bson.json_util import default
-from _mysql import NULL
-from django.contrib.admin.utils import help_text_for_field
+import hashlib,time 
 # Create your models here.
 #在这里可以创建所有的表格。每个表就是一个class
 
@@ -53,22 +49,25 @@ ST_CHOICES = (
     (-1, u'删除'),
 )
 
+#获取同一本书book的后一个内容
+def getNextBookDetail(detail): 
+    details = BookDetail.objects.filter(id=detail.id)
+    if len(details) ==0:
+        return None
+    detail = details[0]
+    result = BookDetail.objects.filter(episode=detail.episode ,id__gt = detail.id).order_by('id') 
+    if not result or len(result) ==0:
+        return None
+    else:
+        return result[0]
+
 #获取同一本书book的后一个章节Episode
-def getNextEpisodeId(bookid,episodeid):
+def getNextEpisode(bookid,episodeid):
     result = BookEpisode.objects.filter(book__id = bookid,id__gt = episodeid).order_by('id') 
     if not result or len(result) ==0:
         return 0,''
     else:
         return result[0].id,result[0].name
-
-def saveOrUpdateBookUserReadlog(userid,detailid):
-    info = BookUserReadlog.objects.filter(userId=userid)  
-    if not info or len (info)==0 :
-        BookUserReadlog(userId=userid,detailId=detailid).save()
-    else:
-        log = info[0] 
-        log.detailId=detailid
-        log.save() 
 
 def getBookListByGenrecode(genrecode,limit=50):
     if genrecode :
@@ -91,37 +90,24 @@ def getEpisodeById(episodeid):
 def getAuthorByContact(contact):
     return BookAuthor.objects.get(contact = contact)
 ##############################
+    
 class BookUserInfo(models.Model):
-    userId =models.CharField(u'用户id',unique=True,max_length=32) # jpush使用。目前是存储jpush上传上来的RegistrationID
+    token =models.CharField(u'用户id',unique=True,max_length=32) # jpush使用。目前是存储jpush上传上来的RegistrationID
     ctime = models.DateTimeField(u'添加日期',auto_now = False,auto_now_add=True ) #第一次时间
     utime = models.DateTimeField(u'更新时间',auto_now = True,null=True)  #每次都变更。
     st = models.IntegerField(u'状态',default=0) #缺省0，删除-1
     partId =models.CharField(u'用户分区id',max_length=2) # 为以后数据库分表，把md5（RegistrationID）截取后2位存储。
     def __unicode__(self):
-        return self.userId
-#     class Meta:  #可以实现联合索引
+        return self.token
+#     class Meta:  #可以实现联合索引 
 #         unique_together = (('userid', 'partid'),)
     
     #重载save方法
     def save(self, force_insert=False, force_update=False, using=None, 
         update_fields=None):
-        self.partId = hashlib.md5(self.userId).hexdigest()[-2:]
+        self.partId = hashlib.md5(self.token).hexdigest()[-2:]
         return models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
-class BookUserReadlog(models.Model):
-    userId =models.CharField(u'用户id',max_length=32) # jpush使用。目前是存储jpush上传上来的RegistrationID 
-    detailId =models.IntegerField(u'书id',default=0)
-    utime = models.DateTimeField(u'更新时间',auto_now = True,null=True)  #每次都变更。
-    st = models.IntegerField(u'状态',default=0) #缺省0，删除-1
-    partId =models.CharField(u'用户分区id',max_length=2) # 为以后数据库分表，把md5（RegistrationID）截取后2位存储。
-    def __unicode__(self):
-        return self.userId
-    def save(self, force_insert=False, force_update=False, using=None, 
-        update_fields=None):
-        self.partId = hashlib.md5(self.userId).hexdigest()[-2:]
-        return models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
-
- 
 class BookTag(models.Model):
     name = models.CharField(max_length=50) 
     def __unicode__(self):
@@ -132,8 +118,7 @@ class BookAuthor(models.Model):
     contact = models.CharField(u'联系方式',max_length=100,blank = True) 
     def __unicode__(self):
         return self.name
-    
-    
+        
 class BookGenre(models.Model):
     COUNTRY_CHOICES = (
         (u'zh', u'中文'),
@@ -225,7 +210,27 @@ class BookDetail(models.Model):
     def __unicode__(self):# 在Python3中用 __str__ 代替 __unicode__
         return self.sender
     
+#  
+class BookUserReadlog(models.Model):
+    user = models.ForeignKey(BookUserInfo,blank = True,null=True)
+    bookdetail = models.ForeignKey(BookDetail,blank = True,null=True)
+    utime = models.DateTimeField(u'更新时间',auto_now = True,null=True)  #每次都变更。
+    ptime = models.DateTimeField(u'更新时间', blank = True,null=True)  #push time。
+    st = models.IntegerField(u'状态',default=0) #缺省0，删除-1
+    partId =models.CharField(u'用户分区id',max_length=2) # 为以后数据库分表，把md5（RegistrationID）截取后2位存储。
+    def __unicode__(self):
+        return self.userId
+    def save(self, force_insert=False, force_update=False, using=None, 
+        update_fields=None):
+        self.partId = hashlib.md5(self.user.token).hexdigest()[-2:]
+        return models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+
+class BookPushLog(models.Model):
+    user = models.ForeignKey(BookUserInfo,related_name = "log_set")
+    bookdetail = models.ForeignKey(BookDetail,blank = True,null=True)
+    ctime = models.DateTimeField(u'添加日期',auto_now = False,auto_now_add=True ) #第一次时间 
     
+ 
 # class Continent(models.Model):
 #     name = models.CharField(max_length=255)
 #     def __str__(self):

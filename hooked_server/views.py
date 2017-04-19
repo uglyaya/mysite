@@ -2,15 +2,16 @@
 from django.http import HttpResponse
 from django.http import JsonResponse 
 from django.shortcuts import render
-from hooked_server.models import Person
+from hooked_server.models import Person, BookDetail
 from hooked_server.form import AddForm 
 from tools import JSONEncoder
 import json
 from django.forms.models import model_to_dict 
 from django.template.context_processors import request
-from models import  getNextEpisodeId,getBookListByGenrecode , getGenreByCode,getGenres,getDetailsByEpisodeid,getEpisodeById,BookUserInfo,saveOrUpdateBookUserReadlog
+from models import  getNextEpisode,getBookListByGenrecode , getGenreByCode,getGenres,getDetailsByEpisodeid,getEpisodeById,BookUserInfo
 from models import BookUserReadlog
 from mysite import settings
+from xadmin.plugins import details
 
 #记录用户的token
 #http://127.0.0.1:8000/user_token/?token=113xx
@@ -19,21 +20,29 @@ def user_token(request):
     token =request.GET['token'] 
     if not token:
         return JsonResponse('no token', safe=False)
-    info = BookUserInfo.objects.filter(userId=token)
-    if len (info)==0 :
-        BookUserInfo(userId=token).save()
+    BookUserInfo.objects.get_or_create(token=token)
     return JsonResponse('ok', safe=False)
 
 #阅读点记录。
-#http://127.0.0.1:8000/user_readlog/?token=113&detailid=1
+# http://127.0.0.1:8000/user_readlog/?token=113&detailid=1
 def user_readlog(request):
     token =request.GET['token'] 
     detailid = request.GET['detailid']
     if not token  or not detailid:
         return JsonResponse('param error', safe=False)
-    saveOrUpdateBookUserReadlog(token,detailid)
+    details = BookDetail.objects.filter(id=detailid)
+    if len(details) ==0:
+        return JsonResponse('detail not exist', safe=False)
+    #如果不存在就创建一个
+    userinfo,created = BookUserInfo.objects.get_or_create(token=token)
+    logs = BookUserReadlog.objects.filter(user__token=token)
+    if len(logs) == 0:
+        BookUserReadlog(user=userinfo,bookdetail = details[0]).save()
+    else:
+        log = logs[0]
+        log.bookdetail = details[0]
+        log.save() 
     return JsonResponse('ok', safe=False)
-    pass
 
 #获取书籍分类列表   
 #http://127.0.0.1:8000/genre_list/?country=zh
@@ -111,7 +120,7 @@ def book_detail(request):
     result['commentCount'] =episode.book.commentCount
     result['coverImageFile'] = settings.MEDIA_URL + str(episode.book.coverImageFile) if episode.book.coverImageFile else ''  
     result['backmusicFile'] =  settings.MEDIA_URL + str(episode.book.backmusicFile) if episode.book.backmusicFile else ''
-    nextepisodeid,nextepisodename =getNextEpisodeId(episode.book.id,episodeid)
+    nextepisodeid,nextepisodename =getNextEpisode(episode.book.id,episodeid)
     result['nextEpisodeid'] = nextepisodeid
     result['nextEpisodename'] = nextepisodename
     for detail in details:

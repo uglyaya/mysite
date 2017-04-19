@@ -103,12 +103,10 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # although not all choices may be available on all operating systems.
 # In a Windows environment this must be set to your system time zone.
 TIME_ZONE = 'Asia/Shanghai'
-
-USE_I18N = True
-
+USE_TZ = False
+USE_I18N = True 
 USE_L10N = True
-
-USE_TZ = True
+ 
  
 try:
     from settings_local import *
