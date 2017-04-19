@@ -50,9 +50,9 @@ def user_readlog(request):
 def genre_list(request):
     country = request.GET.get('country')
     if not country :
-        country = 'zh-Hans'
-    if country == 'zh-Hans-CN':
-        country = 'zh-Hans'
+        country = 'en'
+    if len(country.split('-'))>2:
+        country = country[0: country.rindex('-')] 
     genreSet =list( getGenres(country))
     result = {}
     result['count'] = len(genreSet)
