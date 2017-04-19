@@ -19,8 +19,8 @@ from jpush import common
 from hooked_server.models import  getNextBookDetail , BookUserReadlog , BookPushLog
  
 if __name__ == '__main__':
-    app_key = '43c5f70e7a01b2e2913f5565'
-    master_secret = 'e563ef8ac2dce3e35073ff67'
+    app_key = '45a4780b0827608a881cb0ad'
+    master_secret = 'e61389dff360c1de3cd6861e'
     _jpush = jpush.JPush(app_key, master_secret)
     readlogs = BookUserReadlog.objects.all()
     for readlog in readlogs : 
