@@ -190,8 +190,8 @@ class BookEpisode(models.Model):
         return self.name
     
 class BookDetail(models.Model):
-    sender = models.CharField(u'sender',max_length=200)
-    text = models.CharField(u'text',max_length=500)
+    sender = models.CharField(u'sender',max_length=200,blank = True,null=True)
+    text = models.CharField(u'text',max_length=500,blank = True,null=True)
     seq = models.IntegerField(u'排序号',default=time.time()) #越大的排越后面
     book = models.ForeignKey(Book)
     textImageFile = models.ImageField(upload_to='photos/text',blank = True,null=True)   

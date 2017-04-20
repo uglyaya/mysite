@@ -1,13 +1,33 @@
 # coding:utf-8
 import xadmin
-from xadmin import views
-from hooked_server.models import Person
+from xadmin import views 
 # from reversion.models import Revision
-from hooked_server.models import Book,BookAuthor,BookDetail,BookEpisode,BookGenre,BookTag
+from hooked_server.models import Book,BookAuthor,BookDetail,BookEpisode,BookGenre,BookTag,Person,Author
 from django.db import models
 from form_utils.widgets import ImageWidget
 # Register your models here.
  
+
+
+class MainDashboard(object):
+    widgets = [
+        [
+            {"type": "html", "title": "Test Widget", "content": "<h3> Welcome to Xadmin! </h3><p>Join Online Group: <br/>QQ Qun : 282936295</p>"},
+#             {"type": "chart", "model": "app.accessrecord", 'chart': 'user_count', 'params': {'_p_date__gte': '2013-01-08', 'p': 1, '_p_date__lt': '2013-01-29'}},
+#             {"type": "list", "model": "app.host", 'params': { 'o':'-guarantee_date'}},
+        ],
+        [
+#             {"type": "qbutton", "title": "Quick Start", "btns": [{'model': Person}, {'model':Author}, {'title': "Google", 'url': "http://www.google.com"}]},
+            {"type": "addform", "model": Person},
+        ]
+    ]
+xadmin.site.register(views.IndexView, MainDashboard)
+
+class BaseSetting(object):
+#     enable_themes = True
+    use_bootswatch = False
+xadmin.sites.site.register(views.BaseAdminView, BaseSetting)
+
 class PersonAdmin(object):
     list_display=('name','age','birthday','tag','ctime','utime','kk')
     

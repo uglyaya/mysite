@@ -17,7 +17,8 @@ django.setup()
 import jpush as jpush
 from jpush import common
 from hooked_server.models import  getNextBookDetail , BookUserReadlog , BookPushLog
- 
+
+
 if __name__ == '__main__':
     app_key = '45a4780b0827608a881cb0ad'
     master_secret = 'e61389dff360c1de3cd6861e'
@@ -29,7 +30,7 @@ if __name__ == '__main__':
         registration_id = readlog.user.token 
         push = _jpush.create_push()
         # if you set the logging level to "DEBUG",it will show the debug logging.
-        _jpush.set_logging("WARNING")
+        _jpush.set_logging("WARNING") 
     #     push.audience = jpush.all
         audiences = {'registration_id':[registration_id]}
         push.audience = json.dumps(audiences)
