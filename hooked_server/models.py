@@ -166,15 +166,23 @@ class Book(models.Model):
     
     def image(self):
         imgurl = settings.MEDIA_URL+str(self.coverImageFile) if  self.coverImageFile else ''
-        return '<img  src="%s" class="field_img"/>' % (imgurl if  imgurl else self.coverImagePath) #class="field_img" 可以显示合适的图片
+        return '<img  src="%s" class="field_img"/>' % (self.coverImagePath if  self.coverImagePath else imgurl) #class="field_img" 可以显示合适的图片
 
     def music(self):
         musicurl =  settings.MEDIA_URL+str(self.backmusicFile) if  self.backmusicFile else ''
-        return '<audio controls="controls"  src="%s" />'%(musicurl if  musicurl else self.backmusicPath) 
+        return '<audio controls="controls"  src="%s" />'%(self.backmusicPath if  self.backmusicPath else musicurl) 
     
     def allepisode(self):
         return format_html('<a href="/xadmin/hooked_server/bookepisode/?_q_='+str(self.id)+'">全部章节('+str(len(self.episode_set.all()))+'章)</a>')
     
+    def getImageUrl(self):
+        imgurl = settings.MEDIA_URL+str(self.coverImageFile) if  self.coverImageFile else ''
+        return self.coverImagePath if  self.coverImagePath else imgurl
+    
+    def getMuiscUrl(self):
+        musicurl =  settings.MEDIA_URL+str(self.backmusicFile) if  self.backmusicFile else ''
+        return self.backmusicPath if  self.backmusicPath else musicurl
+
     image.allow_tags = True #这行不加在list页面只会显示图片地址。不会显示图片
     music.allow_tags =True 
     

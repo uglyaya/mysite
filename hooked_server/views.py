@@ -86,8 +86,8 @@ def book_list(request):
             'author':book.author.name,
             'genre':book.genre.name,
             'summary':book.summary,
-            'coverImageFile': settings.MEDIA_URL + str(book.coverImageFile) if book.coverImageFile else '',
-            'backmusicFile':   settings.MEDIA_URL + str(book.backmusicFile) if book.backmusicFile else '',
+            'coverImageFile': book.getImageUrl(),
+            'backmusicFile':   book.getMuiscUrl(),
             'commentCount':book.commentCount,
             'ctime':book.ctime,
             'utime':book.utime,
@@ -148,8 +148,10 @@ def import_book(request,genreid):
             authorname = form.cleaned_data['author']
             summary = form.cleaned_data['summary']
             genreid = form.cleaned_data['genreid']
-            imagefile=form.cleaned_data['imagefile']
-            txtfile=form.cleaned_data['txtfile']
+            content =form.cleaned_data['content']
+            imageurl = form.cleaned_data['imageurl']
+#             imagefile=form.cleaned_data['imagefile']
+#             txtfile=form.cleaned_data['txtfile']
             author,created = BookAuthor.objects.get_or_create(name = authorname) 
             #保存书
             book,created = Book.objects.get_or_create(
@@ -158,20 +160,20 @@ def import_book(request,genreid):
                 genre = genre,
                 commentCount =100,
                 summary = summary,
-                coverImageFile = imagefile,
+                coverImagePath = imageurl,
                 )
             #保存章节
             title = '第一章'
             episodebean ,created = BookEpisode.objects.get_or_create(name=title,book=book,seq=1,st=0)   
-            line =  txtfile.readline()
+            lines = content.split('\n')
             seq=0
-            while line:
+            for line in lines:
                 seq+=1 
                 line = line.strip() 
-                line = line.decode('gbk').encode('utf-8')
+                print line
+#                 line = line.decode('gbk').encode('utf-8')
                 if line !='':
                     BookDetail.objects.get_or_create(sender='',text=delEmoji(line),episode=episodebean,book=book,seq=seq)
-                line =  txtfile.readline()
             result = '添加成功：'+bookname 
     else:
         form = ImportBookForm(initial={'genreid': genreid})  #设置表单默认值  
