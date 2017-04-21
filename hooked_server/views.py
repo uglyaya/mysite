@@ -2,8 +2,8 @@
 from django.http import HttpResponse
 from django.http import JsonResponse 
 from django.shortcuts import render
-from hooked_server.models import Person, BookDetail
-from hooked_server.form import AddForm 
+from hooked_server.models import Person, BookDetail, BookGenre,Book,BookAuthor,BookEpisode
+from hooked_server.form import AddForm ,ImportBookForm
 from tools import JSONEncoder
 import json
 from django.forms.models import model_to_dict 
@@ -11,8 +11,7 @@ from django.template.context_processors import request
 from models import  getNextEpisode,getBookListByGenrecode , getGenreByCode,getGenres,getDetailsByEpisodeid,getEpisodeById,BookUserInfo
 from models import BookUserReadlog
 from mysite import settings
-from xadmin.plugins import details
-
+from xadmin.plugins import details 
 #记录用户的token
 #http://127.0.0.1:8000/user_token/?token=113xx
 # http://api.hooked.top/user_token/?token=xxxx
@@ -137,9 +136,72 @@ def book_detail(request):
             })
     result['details'] =detailresult
     return JsonResponse(result, safe=False)
+##########################################
+#从txt文件导入一本书
+def import_book(request,genreid):
+    genre = BookGenre.objects.get(id=genreid)
+    result = '请添加新书'
+    if request.method == 'POST':# 当提交表单时
+        form = ImportBookForm(request.POST or None, request.FILES or None) # form 包含提交的数据
+        if form.is_valid():# 如果提交的数据合法
+            bookname = form.cleaned_data['bookname']
+            authorname = form.cleaned_data['author']
+            summary = form.cleaned_data['summary']
+            genreid = form.cleaned_data['genreid']
+            imagefile=form.cleaned_data['imagefile']
+            txtfile=form.cleaned_data['txtfile']
+            author,created = BookAuthor.objects.get_or_create(name = authorname) 
+            #保存书
+            book,created = Book.objects.get_or_create(
+                name=bookname,
+                author = author,
+                genre = genre,
+                commentCount =100,
+                summary = summary,
+                coverImageFile = imagefile,
+                )
+            #保存章节
+            title = '第一章'
+            episodebean ,created = BookEpisode.objects.get_or_create(name=title,book=book,seq=1,st=0)   
+            line =  txtfile.readline()
+            seq=0
+            while line:
+                seq+=1 
+                line = line.strip() 
+                line = line.decode('gbk').encode('utf-8')
+                if line !='':
+                    BookDetail.objects.get_or_create(sender='',text=delEmoji(line),episode=episodebean,book=book,seq=seq)
+                line =  txtfile.readline()
+            result = '添加成功：'+bookname 
+    else:
+        form = ImportBookForm(initial={'genreid': genreid})  #设置表单默认值  
+    return  render(request, 'import_book.html',{
+        'form':form,
+        'genre':genre,
+        'result':result
+        })
 
 
-
+import re
+def delEmoji(str):
+    try:
+        # Wide UCS-4 build
+        myre = re.compile(u'['
+            u'\U0001F300-\U0001F64F'
+            u'\U0001F600-\U0001F6FF'
+            u'\U0001F900-\U0001F9FF'
+            u'\u2600-\u2B55]+',
+            re.UNICODE)
+    except re.error:
+        # Narrow UCS-2 build
+        myre = re.compile(u'('
+            u'\ud83c[\udf00-\udfff]|'
+            u'\ud83d[\udc00-\ude4f\ude80-\udeff]|'
+            u'\ud83e[\udd00-\udfff]|'
+            u'[\u2600-\u2B55])+',
+            re.UNICODE)
+     
+    return myre.sub('', str)  # 替换字符串中的Emoji
 ###########################################
 def index(request):
     TutorialList = ["HTML", "CSS", "jQuery", "Python", "Django"]

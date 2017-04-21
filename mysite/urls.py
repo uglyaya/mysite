@@ -18,14 +18,14 @@ from hooked_server import views as hooked_server_views
 import xadmin,smart_selects
 xadmin.autodiscover();
 from xadmin.plugins import xversion
-from hooked_server import views
-
+from hooked_server import views 
 xversion.register_models()
-
+import django.contrib.auth
 urlpatterns = [ 
-    url(r'^admin/', include(admin.site.urls)),
+#     url(r'^admin/', include(admin.site.urls)),
     url(r'^xadmin/', include(xadmin.site.urls)), 
-    url(r'^chaining/', include('smart_selects.urls')),
+    url(r'^chaining/', include('smart_selects.urls')), 
+    url(r'^xadmin/hooked_server/bookgenre/(.+)/import_book/$', views.import_book),
     
     url(r'^genre_list', views.genre_list),
     url(r'^book_list', views.book_list),

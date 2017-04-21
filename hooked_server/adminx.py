@@ -1,12 +1,11 @@
 # coding:utf-8
 import xadmin
-from xadmin import views 
-# from reversion.models import Revision
+from xadmin import views  
 from hooked_server.models import Book,BookAuthor,BookDetail,BookEpisode,BookGenre,BookTag,Person,Author
 from django.db import models
 from form_utils.widgets import ImageWidget
-# Register your models here.
- 
+from xadmin.plugins.actions import BaseActionView
+from django.http import HttpResponse
 
 
 class MainDashboard(object):
@@ -18,22 +17,20 @@ class MainDashboard(object):
         ],
         [
 #             {"type": "qbutton", "title": "Quick Start", "btns": [{'model': Person}, {'model':Author}, {'title': "Google", 'url': "http://www.google.com"}]},
-            {"type": "addform", "model": Person},
+            {"type": "addform", "model": Person}, 
         ]
     ]
 xadmin.site.register(views.IndexView, MainDashboard)
 
-class BaseSetting(object):
-#     enable_themes = True
-    use_bootswatch = False
-xadmin.sites.site.register(views.BaseAdminView, BaseSetting)
 
 class PersonAdmin(object):
     list_display=('name','age','birthday','tag','ctime','utime','kk')
+    #重载系统内的模版页面，可以修改为自定义的。
+    add_form_template = 'views/form.html'
+    change_form_template = 'views/form.html'
     
 #保存前执行 其中obj是修改后的对象，form是返回的表单（修改后的），当新建一个对象时 change = False, 当修改一个对象时 change = True
-    def save_models(self):
-        print 'aaaaaaaaaaaaaaaaaaa'
+    def save_models(self): 
         obj= self.new_obj
         print self.request.user.email  #这里可以直接访问当前操作的用户信息
         obj.save() 
@@ -42,11 +39,27 @@ class PersonAdmin(object):
         print 'delete_model'
 #         super().delete_model()
 ##########################################
+# 插件动作Action   ：https://github.com/WBowam/wbowam.github.com/wiki/Xadmin-start(2)  
+class BookGenreAction(BaseActionView):
+    # 这里需要填写三个属性
+    action_name = "bookgenre_action_close"    #: 相当于这个 Action 的唯一标示, 尽量用比较针对性的名字
+    description = (u'修改状态 %(verbose_name_plural)s') #: 描述, 出现在 Action 菜单中, 可以使用 ``%(verbose_name_plural)s`` 代替 Model 的名字.
+    model_perm = 'change'    #: 该 Action 所需权限
+    # 而后实现 do_action 方法
+    def do_action(self, queryset):
+        # queryset 是包含了已经选择的数据的 queryset
+        for obj in queryset:
+            # obj 的操作
+            print obj
+        # 返回 HttpResponse
+        return HttpResponse('ok')
 
 #http://www.cnblogs.com/BeginMan/archive/2013/05/11/3072444.html  model额外属性讲解
 class BookGenreAdmin(object):
-    list_display=('name','books','country','code','seq','image')
+    list_display=('name','books','country','code','seq','image','import_book')
     list_filter=('country',)
+    actions = [BookGenreAction, ]  #上面定义的那个action
+    list_editable = ['name', ]  #列表页修改。对于价格，状态等参数比较好用。
     ordering = ('seq',) #用作列表页的排序
     pass
 
@@ -114,13 +127,7 @@ class GlobalSetting(object):
 #         return menus
     
     #菜单设置
-    def get_site_menu(self): 
-        pass
-#         print self.admin_site._registry.items()
-#         print self.admin_site._registry.items()[1]
-        
-#         del self.admin_site._registry.items()[1]
-#         print len(self.admin_site._registry.items())
+    def get_site_menu(self):  
         return (
             {'title': 'API接口demo', 'perm': self.get_model_perm(Book, 'view'), 'menus':(
                     {'title': 'genre_list',  'url': '/genre_list/?country=CN' },
@@ -129,24 +136,13 @@ class GlobalSetting(object):
                     {'title': 'user_token',  'url': '/user_token/?token=xxxx' },
                     {'title': 'user_readlog',  'url': '/user_readlog/?token=xxxx&detailid=1' }, 
                )}, 
-        )
-        
-#     def get_nav_menu(self):
-#         print self.get_site_menu()
-    
+        ) 
 xadmin.site.register(views.CommAdminView, GlobalSetting)
-# xadmin.site.unregister(Revision)
 
-# from hooked_server.models import City, Continent,Country,Neighborhood
-# class ContinentAdmin(object):
-#     pass
-# class CountryAdmin(object):
-#     pass    
-# class CityAdmin(object):
-#     pass
-# class NeighborhoodAdmin(object):
-#     pass
-# xadmin.site.register(Continent, ContinentAdmin)
-# xadmin.site.register(Country, CountryAdmin)
-# xadmin.site.register(City, CityAdmin)
-# xadmin.site.register(Neighborhood, NeighborhoodAdmin)
+
+class BaseSetting(object):
+    enable_themes = True
+    use_bootswatch = False
+xadmin.sites.site.register(views.BaseAdminView, BaseSetting)
+#
+from xpluging import *

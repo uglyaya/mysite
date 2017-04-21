@@ -142,6 +142,9 @@ class BookGenre(models.Model):
         return '<img  src="'+settings.MEDIA_URL if not self.coverImageFile.startswith('http') else ''+'%s" class="field_img"/>' % self.coverImageFile #class="field_img" 可以显示合适的图片
     image.allow_tags = True #这行不加在list页面只会显示图片地址。不会显示图片
     
+    def import_book(self):
+        return format_html('<a href="/xadmin/hooked_server/bookgenre/'+str(self.id)+'/import_book/" target="_blank">导入txt</a>')
+    
     def books(self):  #用来自定义右侧列表栏外加的内容。
         return format_html('<a href="/xadmin/hooked_server/book/?_p_genre__id__exact='+str(self.id)+'">全部书('+str(len(self.genre_set.all()))+'本)</a>')
 
