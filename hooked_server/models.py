@@ -124,6 +124,12 @@ class BookGenre(models.Model):
         (u'zh-Hans', u'中文'),
         (u'ja' , u'日语'),
         (u'en' , u'英语'),
+        (u'de' , u'德语'),
+        (u'es' , u'西班牙'),
+        (u'it' , u'意大利'),
+        (u'fr' , u'法语'),
+        (u'ko' , u'韩语'),
+        (u'pt' , u'葡萄牙'),  
     )
     code = models.CharField(u'文章类型code',max_length=30)
     name = models.CharField(u'分类名称',max_length=30)
@@ -149,7 +155,7 @@ class BookGenre(models.Model):
         return format_html('<a href="/xadmin/hooked_server/book/?_p_genre__id__exact='+str(self.id)+'">全部书('+str(len(self.genre_set.all()))+'本)</a>')
 
 class Book(models.Model):
-    name = models.CharField(u'书名',max_length=30)
+    name = models.CharField(u'书名',max_length=200)
     author = models.ForeignKey(BookAuthor,related_name = "author_set")
     genre = models.ForeignKey(BookGenre,related_name = "genre_set")
     coverImageFile = models.ImageField(upload_to='photos',blank = True,null=True,max_length=500)   
@@ -157,7 +163,7 @@ class Book(models.Model):
     backmusicFile = models.FileField(upload_to='musics' ,blank = True,null=True,max_length=500)  
     backmusicPath = models.CharField(u'声音绝对地址',blank = True,null=True,max_length=500)   
     commentCount = models.IntegerField(u'评价数',default=100)
-    summary = models.CharField(u'简介',max_length=500,blank = True,null=True)
+    summary = models.CharField(u'简介',max_length=2000,blank = True,null=True)
     ctime = models.DateTimeField(u'添加日期',auto_now = False,auto_now_add=True ) #第一次时间
     utime = models.DateTimeField(u'更新时间',auto_now = True,null=True)  #每次都变更。
     tags = models.ManyToManyField(BookTag,blank = True) 
@@ -202,7 +208,7 @@ class BookEpisode(models.Model):
     
 class BookDetail(models.Model):
     sender = models.CharField(u'sender',max_length=200,blank = True,null=True)
-    text = models.CharField(u'text',max_length=500,blank = True,null=True)
+    text = models.CharField(u'text',max_length=3000,blank = True,null=True)
     seq = models.IntegerField(u'排序号',default=int(time.time())) #越大的排越后面
     book = models.ForeignKey(Book)
     textImageFile = models.ImageField(upload_to='photos/text',blank = True,null=True)   
