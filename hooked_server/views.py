@@ -174,9 +174,8 @@ def import_book(request,genreid):
 #                 line = line.decode('gbk').encode('utf-8')
                 if line !='':
                     BookDetail.objects.get_or_create(sender='',text=delEmoji(line),episode=episodebean,book=book,seq=seq)
-            result = '添加成功：'+bookname 
-    else:
-        form = ImportBookForm(initial={'genreid': genreid})  #设置表单默认值  
+            result = '**添加成功：'+bookname        
+    form = ImportBookForm(initial={'genreid': genreid})  #设置表单默认值  
     return  render(request, 'import_book.html',{
         'form':form,
         'genre':genre,
