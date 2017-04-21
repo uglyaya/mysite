@@ -71,7 +71,7 @@ def getNextEpisode(bookid,episodeid):
 
 def getBookListByGenrecode(genrecode,limit=50):
     if genrecode :
-        return Book.objects.filter(genre__code = genrecode)
+        return Book.objects.filter(genre__code = genrecode).order_by('-id') 
     else:
         return Book.objects.all()
 
