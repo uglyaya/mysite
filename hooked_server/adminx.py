@@ -87,7 +87,7 @@ class BookEpisodeAdmin(object):
     pass
 
 class BookDetailAdmin(object):
-    list_display=('sender','text','book','episode','seq')
+    list_display=('id','sender','text','book','episode','seq')
     search_fields=[ '=episode__id' ]  #增加一个搜索框
     ordering = ('seq',) #用作列表页的排序
     pass
