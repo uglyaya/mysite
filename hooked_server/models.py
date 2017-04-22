@@ -135,8 +135,8 @@ class BookGenre(models.Model):
     name = models.CharField(u'分类名称',max_length=30)
     seq = models.IntegerField(u'排序号',default=0) #越大的排越后面
     coverImageFile = models.ImageField(upload_to='photos/genre',blank = True,null=True) 
-    backColor = models.CharField(u'背景颜色',max_length=10,blank = True, default='#0000FF')
-    fontColor = models.CharField(u'字体颜色',max_length=10,blank = True, default='#FFFFFF' ,
+    backColor = models.CharField(u'背景颜色',max_length=10,blank = True, default='0x0000FF')
+    fontColor = models.CharField(u'字体颜色',max_length=10,blank = True, default='0xFFFFFF' ,
                                  help_text='分类字体的颜色，采用#FFEEBB这个格式。<a href="http://tool.oschina.net/commons?type=3">色表对照</a>')
     country = models.CharField(u'国家',default='zh',max_length=20,choices=COUNTRY_CHOICES)
     st = models.IntegerField(u'状态',default=0,choices=ST_CHOICES) #缺省0，删除-1
