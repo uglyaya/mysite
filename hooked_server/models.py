@@ -169,6 +169,7 @@ class Book(models.Model):
     tags = models.ManyToManyField(BookTag,blank = True) 
     operator =  models.CharField(u'操作人',max_length=30,blank = True,null=True) #存储最后操作人id
     st = models.IntegerField(u'状态',default=0,choices=ST_CHOICES) #缺省0，删除-1
+    outid = models.CharField(u'外部id',max_length=200,blank = True,null=True)
     
     def image(self):
         imgurl = settings.MEDIA_URL+str(self.coverImageFile) if  self.coverImageFile else ''
