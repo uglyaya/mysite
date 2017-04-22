@@ -49,6 +49,17 @@ ST_CHOICES = (
     (-1, u'删除'),
 )
 
+COUNTRY_CHOICES = (
+    (u'zh-Hans', u'中文'),
+    (u'ja' , u'日语'),
+    (u'en' , u'英语'),
+    (u'de' , u'德语'),
+    (u'es' , u'西班牙'),
+    (u'it' , u'意大利'),
+    (u'fr' , u'法语'),
+    (u'ko' , u'韩语'),
+    (u'pt' , u'葡萄牙'),  
+)
 #获取同一本书book的后一个内容
 def getNextBookDetail(detail): 
     details = BookDetail.objects.filter(id=detail.id)
@@ -81,6 +92,9 @@ def getGenreByCode(genrecode):
 def getGenres(country):
     return BookGenre.objects.filter(country=country,st=0)
 
+def getLanguages():
+    return BookLanguage.objects.filter(st=0)
+
 def getDetailsByEpisodeid(episodeid):
     return BookDetail.objects.filter(episode__id = episodeid)
 
@@ -90,6 +104,23 @@ def getEpisodeById(episodeid):
 def getAuthorByContact(contact):
     return BookAuthor.objects.get(contact = contact)
 ##############################
+class BookLanguage(models.Model):
+    code = models.CharField(u'语音代码',unique=True,max_length=32)
+    localname = models.CharField(u'本地语言名',unique=True,max_length=32)
+    chinesename = models.CharField(u'中文语言名',unique=True,max_length=32) 
+    coverImageFile = models.ImageField(upload_to='photos/genre',blank = True,null=True) 
+    coverImagePath = models.CharField(u'图片绝对地址',blank = True,null=True,max_length=500)   
+    st = models.IntegerField(u'状态',default=0,choices=ST_CHOICES) #缺省0，删除-1
+    def image(self): 
+        return '<img  src="%s" class="field_img"/>' % (self.getImageUrl()) #class="field_img" 可以显示合适的图片
+ 
+    def getImageUrl(self):
+        imgurl = settings.MEDIA_URL+str(self.coverImageFile) if  self.coverImageFile else ''
+        return self.coverImagePath if  self.coverImagePath else imgurl
+    
+    image.allow_tags = True #这行不加在list页面只会显示图片地址。不会显示图片
+    def __unicode__(self):
+        return self.code
     
 class BookUserInfo(models.Model):
     token =models.CharField(u'用户id',unique=True,max_length=32) # jpush使用。目前是存储jpush上传上来的RegistrationID
@@ -120,17 +151,6 @@ class BookAuthor(models.Model):
         return self.name
         
 class BookGenre(models.Model):
-    COUNTRY_CHOICES = (
-        (u'zh-Hans', u'中文'),
-        (u'ja' , u'日语'),
-        (u'en' , u'英语'),
-        (u'de' , u'德语'),
-        (u'es' , u'西班牙'),
-        (u'it' , u'意大利'),
-        (u'fr' , u'法语'),
-        (u'ko' , u'韩语'),
-        (u'pt' , u'葡萄牙'),  
-    )
     code = models.CharField(u'文章类型code',max_length=30)
     name = models.CharField(u'分类名称',max_length=30)
     seq = models.IntegerField(u'排序号',default=0) #越大的排越后面
@@ -171,13 +191,11 @@ class Book(models.Model):
     st = models.IntegerField(u'状态',default=0,choices=ST_CHOICES) #缺省0，删除-1
     outid = models.CharField(u'外部id',max_length=200,blank = True,null=True)
     
-    def image(self):
-        imgurl = settings.MEDIA_URL+str(self.coverImageFile) if  self.coverImageFile else ''
-        return '<img  src="%s" class="field_img"/>' % (self.coverImagePath if  self.coverImagePath else imgurl) #class="field_img" 可以显示合适的图片
+    def image(self): 
+        return '<img  src="%s" class="field_img"/>' % (self.getImageUrl()) #class="field_img" 可以显示合适的图片
 
-    def music(self):
-        musicurl =  settings.MEDIA_URL+str(self.backmusicFile) if  self.backmusicFile else ''
-        return '<audio controls="controls"  src="%s" />'%(self.backmusicPath if  self.backmusicPath else musicurl) 
+    def music(self): 
+        return '<audio controls="controls"  src="%s" />'%(self.getMuiscUrl()) 
     
     def allepisode(self):
         return format_html('<a href="/xadmin/hooked_server/bookepisode/?_q_='+str(self.id)+'">全部章节('+str(len(self.episode_set.all()))+'章)</a>')

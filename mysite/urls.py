@@ -32,6 +32,7 @@ urlpatterns = [
     url(r'^book_detail', views.book_detail),
     url(r'^user_token', views.user_token),
     url(r'^user_readlog', views.user_readlog),
+    url(r'^language_list', views.language_list),
     
     url(r'^$', hooked_server_views.index),
     url(r'^form/$', hooked_server_views.form),

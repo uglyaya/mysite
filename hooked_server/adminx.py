@@ -1,7 +1,7 @@
 # coding:utf-8
 import xadmin
 from xadmin import views  
-from hooked_server.models import Book,BookAuthor,BookDetail,BookEpisode,BookGenre,BookTag,Person,Author
+from hooked_server.models import Book,BookAuthor,BookDetail,BookEpisode,BookGenre,BookTag,Person,BookLanguage
 from django.db import models
 from form_utils.widgets import ImageWidget
 from xadmin.plugins.actions import BaseActionView
@@ -64,8 +64,10 @@ class BookGenreAdmin(object):
     pass
 
 class BookAuthorAdmin(object):
-    list_display=('name','contact') 
-    pass
+    list_display=('name','contact')  
+
+class BookLanguageAdmin(object):
+    list_display=('code','localname','chinesename','image')  
 
 class BookAdmin(object):
     list_display=('name','allepisode','genre','author','image')
@@ -94,6 +96,7 @@ class BookTagAdmin(object):
     pass
 
 xadmin.site.register(Person,PersonAdmin) #这些list_display的列需要列在admin里面列出来
+xadmin.site.register(BookLanguage,BookLanguageAdmin) 
 xadmin.site.register(BookGenre,BookGenreAdmin) 
 xadmin.site.register(Book,BookAdmin) 
 xadmin.site.register(BookEpisode,BookEpisodeAdmin) 
@@ -130,6 +133,7 @@ class GlobalSetting(object):
     def get_site_menu(self):  
         return (
             {'title': 'API接口demo', 'perm': self.get_model_perm(Book, 'view'), 'menus':(
+                    {'title': 'language_list',  'url': '/language_list/' },
                     {'title': 'genre_list',  'url': '/genre_list/?country=CN' },
                     {'title': 'book_list',  'url': '/book_list/?genrecode=aiqing' },
                     {'title': 'book_detail',  'url': '/book_detail/?episodeid=1' },

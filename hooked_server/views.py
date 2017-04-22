@@ -8,10 +8,25 @@ from tools import JSONEncoder
 import json
 from django.forms.models import model_to_dict 
 from django.template.context_processors import request
-from models import  getNextEpisode,getBookListByGenrecode , getGenreByCode,getGenres,getDetailsByEpisodeid,getEpisodeById,BookUserInfo
+from models import  getNextEpisode,getBookListByGenrecode , getGenreByCode,getGenres,getDetailsByEpisodeid,getEpisodeById,BookUserInfo,getLanguages
 from models import BookUserReadlog
-from mysite import settings
-from xadmin.plugins import details 
+from mysite import settings 
+
+def language_list(request):
+    languageSet =list(getLanguages())
+    result = {}
+    result['count'] = len(languageSet)
+    languages = []
+    for language in languageSet :
+        languages.append({ 
+            'code':language.code,
+            'localname':language.localname,
+            'chinesename':language.chinesename, 
+            'imageurl': language.getImageUrl(), 
+            })
+    result['languages'] = languages
+    return JsonResponse(result, safe=False)
+
 #记录用户的token
 #http://127.0.0.1:8000/user_token/?token=113xx
 # http://api.hooked.top/user_token/?token=xxxx
@@ -52,7 +67,7 @@ def genre_list(request):
         country = 'en'
     if len(country.split('-'))>1:
         country = country[0: country.rindex('-')] 
-    genreSet =list( getGenres(country))
+    genreSet =list(getGenres(country))
     result = {}
     result['count'] = len(genreSet)
     genrelist = []
