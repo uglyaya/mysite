@@ -42,7 +42,7 @@ def user_token(request):
 def user_readlog(request):
     token =request.GET['token'] 
     detailid = request.GET['detailid']
-    if not token  or not detailid:
+    if not token  or not detailid or token.find('null') or detailid.find('null'):
         return JsonResponse('param error', safe=False)
     details = BookDetail.objects.filter(id=detailid)
     if len(details) ==0:
