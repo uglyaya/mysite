@@ -70,7 +70,7 @@ class BookLanguageAdmin(object):
     list_display=('code','localname','chinesename','image')  
 
 class BookAdmin(object):
-    list_display=('name','allepisode','genre','author','image')
+    list_display=('name','allepisode','genre','author','image','ispop')
     search_fields=[ 'name','tags__name' ]  #增加一个搜索框
     list_filter=('genre',)
     formfield_overrides = { models.ImageField: {'widget': ImageWidget}}
@@ -134,7 +134,7 @@ class GlobalSetting(object):
         return (
             {'title': 'API接口demo', 'perm': self.get_model_perm(Book, 'view'), 'menus':(
                     {'title': 'language_list',  'url': '/language_list/' },
-                    {'title': 'genre_list',  'url': '/genre_list/?country=CN' },
+                    {'title': 'genre_list',  'url': '/genre_list/?country=zh-Hans-cn' },
                     {'title': 'book_list',  'url': '/book_list/?genrecode=aiqing' },
                     {'title': 'book_detail',  'url': '/book_detail/?episodeid=1' },
                     {'title': 'user_token',  'url': '/user_token/?token=xxxx' },

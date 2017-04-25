@@ -23,7 +23,7 @@ if __name__ == '__main__':
     app_key = '45a4780b0827608a881cb0ad'
     master_secret = 'e61389dff360c1de3cd6861e'
     _jpush = jpush.JPush(app_key, master_secret)
-    readlogs = BookUserReadlog.objects.all()
+    readlogs = BookUserReadlog.objects.filter(st=0)
     for readlog in readlogs : 
         nextBookdetail= getNextBookDetail(readlog.bookdetail)
         if not nextBookdetail: continue
@@ -34,11 +34,17 @@ if __name__ == '__main__':
     #     push.audience = jpush.all
         audiences = {'registration_id':[registration_id]}
         push.audience = json.dumps(audiences)
-        push.notification = jpush.notification(alert="%s:%s"%(nextBookdetail.sender,nextBookdetail.text))
+        text = "%s:%s"%(nextBookdetail.sender,nextBookdetail.text)
+        extra = {
+            'detailid':'%s'%readlog.bookdetail.id,
+            'type':'read',
+            }
+        ios = jpush.ios(alert=text,  extras=extra)
+        push.notification = jpush.notification(ios=ios)
         push.platform = jpush.all_
         try:
             response=push.send()
-            print  response
+            print str(registration_id) +":"+ str(response.payload)
             readlog.ptime = datetime.datetime.now()
             readlog.save()
             BookPushLog(user=readlog.user,bookdetail=readlog.bookdetail).save()

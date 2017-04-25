@@ -49,6 +49,11 @@ ST_CHOICES = (
     (-1, u'删除'),
 )
 
+POP_CHOICES = {
+    (0,u'否'),
+    (1,u'是'),
+    }
+
 COUNTRY_CHOICES = (
     (u'zh-Hans', u'中文'),
     (u'ja' , u'日语'),
@@ -85,12 +90,16 @@ def getBookListByGenrecode(genrecode,limit=50):
         return Book.objects.filter(genre__code = genrecode).order_by('-id') 
     else:
         return Book.objects.all()
+    
+def getPopBookListByCountry(country,limit=50):
+    return Book.objects.filter(genre__country = country,ispop = 1).order_by('-id')[:limit]
+
 
 def getGenreByCode(genrecode):
     return BookGenre.objects.filter(code=genrecode)
 
 def getGenres(country):
-    return BookGenre.objects.filter(country=country,st=0)
+    return BookGenre.objects.filter(country=country,st=0).order_by('-seq')
 
 def getLanguages():
     return BookLanguage.objects.filter(st=0)
@@ -190,6 +199,7 @@ class Book(models.Model):
     operator =  models.CharField(u'操作人',max_length=30,blank = True,null=True) #存储最后操作人id
     st = models.IntegerField(u'状态',default=0,choices=ST_CHOICES) #缺省0，删除-1
     outid = models.CharField(u'外部id',max_length=200,blank = True,null=True)
+    ispop = models.IntegerField(u'是否推荐',default=0,choices=POP_CHOICES) #0否，1是
     
     def image(self): 
         return '<img  src="%s" class="field_img"/>' % (self.getImageUrl()) #class="field_img" 可以显示合适的图片

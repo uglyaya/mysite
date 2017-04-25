@@ -89,6 +89,8 @@ def genre_list(request):
 # http://api.hooked.top/book_list/?genrecode=aiqing
 def book_list(request):  
     genrecode = request.GET.get('genrecode')
+    if not genrecode:
+        return JsonResponse('param error', safe=False)
     genreSet = getGenreByCode(genrecode)
     if not genreSet :
         return JsonResponse('genre error', safe=False)
