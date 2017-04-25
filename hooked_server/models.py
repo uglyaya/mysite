@@ -99,7 +99,7 @@ def getGenreByCode(genrecode):
     return BookGenre.objects.filter(code=genrecode)
 
 def getGenres(country):
-    return BookGenre.objects.filter(country=country,st=0).order_by('-seq')
+    return BookGenre.objects.filter(country=country,st=0).order_by('seq')
 
 def getLanguages():
     return BookLanguage.objects.filter(st=0)
