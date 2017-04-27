@@ -67,7 +67,7 @@ def genre_list(request):
         country = 'en'
     if len(country.split('-'))>1:
         country = country[0: country.rindex('-')] 
-    country = 'ja'
+#     country = 'ja'
     genreSet =list(getGenres(country))
     result = {}
     result['count'] = len(genreSet)
