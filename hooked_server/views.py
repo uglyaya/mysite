@@ -12,6 +12,7 @@ from models import  getNextEpisode,getBookListByGenrecode , getGenreByCode,getGe
 from models import BookUserReadlog
 from mysite import settings 
 from utils import doget2
+from test.test_functools import capture
 
 def language_list(request):
     languageSet =list(getLanguages())
@@ -191,26 +192,27 @@ def import_book_strawberry(request,genreid):
             pages = pageslist[0]
             print pages
             content =''
+            episodebean = None
             for i in range(int(pages)) :
                 url = 'https://no-ichigo.jp/read/page/book_id/%s/page/%s'%(bookid,str(i+1))
                 pagecontent = doget2(url)
+                chapter = re.findall(r'<p class="chapter">([^<]+)<br />',pagecontent, re.S)
+                if chapter and chapter[0]:
+                    episodebean ,created = BookEpisode.objects.get_or_create(name=chapter[0].decode(),book=book,seq=i,st=0)   
+                elif not episodebean: 
+                    episodebean ,created = BookEpisode.objects.get_or_create(name= '第一章',book=book,seq=i,st=0)   
 #                 print pagecontent
                 page = re.findall(r"<!-- /content-header -->(.+)<!-- /content-mailcol -->",pagecontent, re.S)
                 page = re.sub(r'<[^>]+>', '',page[0].decode()) 
-#                 print page
-                content = content + page
-#             print content
-            #保存章节
-            title = '第一章'
-            episodebean ,created = BookEpisode.objects.get_or_create(name=title,book=book,seq=1,st=0)   
-            lines = content.split('\n')
-            seq=0
-            for line in lines:
-                seq+=1 
-                line = line.strip() 
-                if line !='':
-                    print line
-                    BookDetail.objects.get_or_create(sender='',text=delEmoji(line),episode=episodebean,book=book,seq=seq)
+#                 print page 
+                lines = page.split('\n')
+                seq=0
+                for line in lines:
+                    seq+=1 
+                    line = line.strip() 
+                    if line !='':
+                        print line
+                        BookDetail.objects.get_or_create(sender='',text=delEmoji(line),episode=episodebean,book=book,seq=i*10000+seq)
     form = ImportBookFormStrawberry(initial={'genreid': genreid})  #设置表单默认值  
     return  render(request, 'import_book_strawberry.html',{
         'form':form,
