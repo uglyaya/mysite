@@ -168,7 +168,7 @@ def import_book_strawberry(request,genreid):
             bookid = bookidlist[0]
             print bookid
             content =doget2(bookurl)
-            namelist = re.findall(r"<span>([^<]+)</span></h2>",content)
+            namelist = re.findall(r'<meta name="title" content="([^\|]+)\|',content)
             bookname = namelist[0].decode()
             print bookname
             authorlist = re.findall(r">([^<]+)</span></a>/著",content)
