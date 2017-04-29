@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>上传一本书</title>
+</head>
+<body> 
+{{result}}<p>
+从野草莓导入一本书<br/>
+    <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}  
+            分类id：{{genre.id}}<p>
+            分类名字：{{genre.name}}<p>
+            {{form.as_p}} 
+     <input type="submit" value="Submit">
+    </form>       
+</body>
+</html>
