@@ -11,8 +11,7 @@ from django.template.context_processors import request
 from models import  getNextEpisode,getBookListByGenrecode , getGenreByCode,getGenres,getDetailsByEpisodeid,getEpisodeById,BookUserInfo,getLanguages
 from models import BookUserReadlog
 from mysite import settings 
-from utils import doget2
-from test.test_functools import capture
+from utils import doget2 
 
 def language_list(request):
     languageSet =list(getLanguages())
