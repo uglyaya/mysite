@@ -187,7 +187,7 @@ def import_book_strawberry(request,genreid):
                 summary = summary,
                 coverImagePath = imageurl,
                 )
-            pageslist = re.findall(r"\[(\d+)ページ \(完\)\]",content)
+            pageslist = re.findall(r"\[(\d+)ページ",content)
             pages = pageslist[0]
             print pages
             content =''
