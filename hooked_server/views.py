@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.http import JsonResponse 
 from django.shortcuts import render
 from hooked_server.models import Person, BookDetail, BookGenre,Book,BookAuthor,BookEpisode
-from hooked_server.form import AddForm ,ImportBookForm
+from hooked_server.form import AddForm ,ImportBookForm,ImportBookFormStrawberry
 from tools import JSONEncoder
 import json
 from django.forms.models import model_to_dict 
@@ -11,6 +11,7 @@ from django.template.context_processors import request
 from models import  getNextEpisode,getBookListByGenrecode , getGenreByCode,getGenres,getDetailsByEpisodeid,getEpisodeById,BookUserInfo,getLanguages
 from models import BookUserReadlog
 from mysite import settings 
+from utils import doget2
 
 def language_list(request):
     languageSet =list(getLanguages())
@@ -155,6 +156,68 @@ def book_detail(request):
     result['details'] =detailresult
     return JsonResponse(result, safe=False)
 ##########################################
+def import_book_strawberry(request,genreid):
+    genre = BookGenre.objects.get(id=genreid)
+    result = '请添加新书'
+    if request.method == 'POST':# 当提交表单时
+        form = ImportBookFormStrawberry(request.POST or None, request.FILES or None) # form 包含提交的数据
+        if form.is_valid():# 如果提交的数据合法
+            bookurl = form.cleaned_data['bookurl'] 
+            imageurl = form.cleaned_data['imageurl'] 
+            bookidlist =  re.findall(r"book_id/(\d+)",bookurl)
+            bookid = bookidlist[0]
+            print bookid
+            content =doget2(bookurl)
+            namelist = re.findall(r"<span>([^<]+)</span></h2>",content)
+            bookname = namelist[0].decode()
+            print bookname
+            authorlist = re.findall(r">([^<]+)</span></a>/著",content)
+            authorname = authorlist[0].decode()
+            print authorname
+            summarylist = re.findall(r'<div id="content-mailcol" class="alignC">(.+)<p class',content, re.S)
+            summary = re.sub(r'<[^>]+>', '',summarylist[0].decode())
+            summary = re.sub(r'\s','',summary)
+            print summary
+            author,created = BookAuthor.objects.get_or_create(name = authorname) 
+            book,created = Book.objects.get_or_create(
+                name=bookname,
+                author = author,
+                genre = genre,
+                commentCount =100,
+                summary = summary,
+                coverImagePath = imageurl,
+                )
+            pageslist = re.findall(r"\[(\d+)ページ \(完\)\]",content)
+            pages = pageslist[0]
+            print pages
+            content =''
+            for i in range(int(pages)) :
+                url = 'https://no-ichigo.jp/read/page/book_id/%s/page/%s'%(bookid,str(i+1))
+                pagecontent = doget2(url)
+#                 print pagecontent
+                page = re.findall(r"<!-- /content-header -->(.+)<!-- /content-mailcol -->",pagecontent, re.S)
+                page = re.sub(r'<[^>]+>', '',page[0].decode()) 
+#                 print page
+                content = content + page
+#             print content
+            #保存章节
+            title = '第一章'
+            episodebean ,created = BookEpisode.objects.get_or_create(name=title,book=book,seq=1,st=0)   
+            lines = content.split('\n')
+            seq=0
+            for line in lines:
+                seq+=1 
+                line = line.strip() 
+                if line !='':
+                    print line
+                    BookDetail.objects.get_or_create(sender='',text=delEmoji(line),episode=episodebean,book=book,seq=seq)
+    form = ImportBookFormStrawberry(initial={'genreid': genreid})  #设置表单默认值  
+    return  render(request, 'import_book_strawberry.html',{
+        'form':form,
+        'genre':genre,
+        'result':result
+        })
+
 #从txt文件导入一本书
 def import_book(request,genreid):
     genre = BookGenre.objects.get(id=genreid)

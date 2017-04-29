@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^xadmin/', include(xadmin.site.urls)), 
     url(r'^chaining/', include('smart_selects.urls')), 
     url(r'^xadmin/hooked_server/bookgenre/(.+)/import_book/$', views.import_book),
+    url(r'^xadmin/hooked_server/bookgenre/(.+)/import_book_strawberry/$', views.import_book_strawberry),
     
     url(r'^genre_list', views.genre_list),
     url(r'^book_list', views.book_list),
