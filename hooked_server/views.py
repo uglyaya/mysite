@@ -164,7 +164,7 @@ def import_book_strawberry(request,genreid):
         if form.is_valid():# 如果提交的数据合法
             bookurl = form.cleaned_data['bookurl'] 
             imageurl = form.cleaned_data['imageurl'] 
-            bookidlist =  re.findall(r"book_id/(\d+)",bookurl)
+            bookidlist =  re.findall(r"(\d+)$",bookurl)
             bookid = bookidlist[0]
             print bookid
             content =doget2(bookurl)
