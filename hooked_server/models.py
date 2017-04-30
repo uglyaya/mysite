@@ -5,6 +5,7 @@ from mysite import settings
 import django.utils.timezone as timezone 
 from django.utils.html import format_html
 import hashlib,time 
+from bson.json_util import default
 # Create your models here.
 #在这里可以创建所有的表格。每个表就是一个class
 
@@ -137,6 +138,7 @@ class BookUserInfo(models.Model):
     utime = models.DateTimeField(u'更新时间',auto_now = True,null=True)  #每次都变更。
     st = models.IntegerField(u'状态',default=0) #缺省0，删除-1
     partId =models.CharField(u'用户分区id',max_length=2) # 为以后数据库分表，把md5（RegistrationID）截取后2位存储。
+    idfa = models.CharField(u'idfa',unique=False,max_length=32,default='') 
     def __unicode__(self):
         return self.token
 #     class Meta:  #可以实现联合索引 

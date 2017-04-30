@@ -33,9 +33,10 @@ def language_list(request):
 # http://api.hooked.top/user_token/?token=xxxx
 def user_token(request): 
     token =request.GET['token'] 
+    idfa =request.GET['idfa'] 
     if not token:
         return JsonResponse('no token', safe=False)
-    BookUserInfo.objects.get_or_create(token=token)
+    BookUserInfo.objects.get_or_create(token=token,idfa=idfa)
     return JsonResponse('ok', safe=False)
 
 #阅读点记录。
