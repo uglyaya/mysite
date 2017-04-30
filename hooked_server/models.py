@@ -138,7 +138,7 @@ class BookUserInfo(models.Model):
     utime = models.DateTimeField(u'更新时间',auto_now = True,null=True)  #每次都变更。
     st = models.IntegerField(u'状态',default=0) #缺省0，删除-1
     partId =models.CharField(u'用户分区id',max_length=2) # 为以后数据库分表，把md5（RegistrationID）截取后2位存储。
-    idfa = models.CharField(u'idfa',unique=False,max_length=32,default='') 
+#     idfa = models.CharField(u'idfa',unique=False,max_length=32,default='') 
     def __unicode__(self):
         return self.token
 #     class Meta:  #可以实现联合索引 

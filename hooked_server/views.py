@@ -37,8 +37,8 @@ def user_token(request):
     if not token:
         return JsonResponse('no token', safe=False)
     userinfo = BookUserInfo.objects.get_or_create(token=token)
-    userinfo.idfa =idfa
-    userinfo.save()
+#     userinfo.idfa =idfa
+#     userinfo.save()
     return JsonResponse('ok', safe=False)
 
 #阅读点记录。
