@@ -186,6 +186,7 @@ def import_book_strawberry(request,genreid):
                 commentCount =100,
                 summary = summary,
                 coverImagePath = imageurl,
+                outid = bookid,
                 )
             pageslist = re.findall(r"\[(\d+)ページ",content)
             pages = pageslist[0]
