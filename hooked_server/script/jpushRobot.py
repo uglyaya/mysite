@@ -36,8 +36,8 @@ if __name__ == '__main__':
         push.audience = json.dumps(audiences)
         text = "%s:%s"%(nextBookdetail.sender,nextBookdetail.text)
         extra = {
-            'detailid':'%s'%readlog.bookdetail.id,
-            'type':'read',
+            'detailid':'%s'%readlog.bookdetail.episode.id,
+             'type':'read',
             }
         ios = jpush.ios(alert=text,  extras=extra)
         push.notification = jpush.notification(ios=ios)
